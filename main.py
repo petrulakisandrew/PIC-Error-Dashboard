@@ -2,18 +2,17 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
+
 #Initiate GIT
 
-
 #Importing Excel DF
-df = pd.read_excel(
-    'C:/Users/Andrew Petrulakis/Desktop/Dashboards/PIC Error Dashboard/Raw Data/Fatal Errors Test 2025-08-08 Updated.xlsx',
-    header=26   #
-)
+with open("local_paths.txt", "r") as f:
+    excel_file = f.readline().strip() 
+      
+df = pd.read_excel(excel_file, header=26)
 
+#Cleaning unused columns
 df = df.drop(["Rec Nbr in Error","Section","Development Number", "Building Number", "Building Number Entrance","Unit Number","PHA Use Only1","PHA Use Only2","PHA Use Only3","PHA Use Only4","PHA Use Only5"], axis=1)
-
-
 # print(df.head())
 
 #Caseworker Column
