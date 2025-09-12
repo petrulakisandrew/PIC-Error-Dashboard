@@ -33,7 +33,15 @@ df["Caseworker"] = np.select(conditions, caseworkers, default="Other")
 
 
 df = df.drop(df[df["Error Type"] == " WARNING"].index)
-# print(df)
+print(df)
 
-col1, = st.columns(1)
-col1.metric("Total Fatal Errors", df["Error Number"].count())
+col1, = st.columns(1) 
+col1.metric("Total Fatal Errors", df["Error Number"].count()) 
+
+#Bar Chart for Errors by Caseworker
+case_counts = df["Caseworker"].value_counts().reset_index()
+case_counts.columns = ["Caseworker", "Count"]
+
+st.subheader("Cases by Caseworker")
+
+st.bar_chart(case_counts.set_index("Caseworker"))
