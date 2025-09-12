@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
+import plotly.express as px
 
 
 #Initiate GIT
@@ -42,6 +43,15 @@ col1.metric("Total Fatal Errors", df["Error Number"].count())
 case_counts = df["Caseworker"].value_counts().reset_index()
 case_counts.columns = ["Caseworker", "Count"]
 
-st.subheader("Cases by Caseworker")
+st.subheader("Errors by Caseworker")
 
-st.bar_chart(case_counts.set_index("Caseworker"))
+
+fig = px.bar(case_counts, x="Caseworker", y="Count", text="Count")
+fig.update_traces(textposition="outside")
+st.plotly_chart(fig, use_container_width=True)
+
+# --- Selection: show rows for chosen caseworker ---
+selected_caseworker = st.selectbox("Select a caseworker to view their errors", case_counts["Caseworker"])
+filtered_df = df[df["Caseworker"] == selected_caseworker]
+st.write(f"Showing all errors for **{selected_caseworker}**:")
+st.dataframe(filtered_df)
