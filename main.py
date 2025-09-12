@@ -18,7 +18,7 @@ df = df.drop(["Rec Nbr in Error","Section","Development Number", "Building Numbe
 
 #Caseworker Column
 conditions = [
-    (df["Last Name"].str.strip().str.lower() >= "a" ) & (df["Last Name"].str.strip().str.lower() <= "bel"),
+    (df["Last Name"].str.strip().str.lower() >= "a" ) & (df["Last Name"].str.strip().str.lower() <= "bel"), 
     (df["Last Name"].str.strip().str.lower() >= "ben" ) & (df["Last Name"].str.strip().str.lower() <= "col"),
     (df["Last Name"].str.strip().str.lower() >= "con" ) & (df["Last Name"].str.strip().str.lower() <= "ful"),
     (df["Last Name"].str.strip().str.lower() >= "gad" ) & (df["Last Name"].str.strip().str.lower() <= "haw"),
@@ -36,6 +36,10 @@ df["Caseworker"] = np.select(conditions, caseworkers, default="Other")
 df = df.drop(df[df["Error Type"] == " WARNING"].index)
 print(df)
 
+#Header for the Dashboard
+st.markdown("<h1 style='text-align: center;'>PIC Fatal Error Dashboard</h1>", unsafe_allow_html=True)
+ 
+#Including Total Count of Fatal Errors
 col1, = st.columns(1) 
 col1.metric("Total Fatal Errors", df["Error Number"].count()) 
 
@@ -54,4 +58,4 @@ st.plotly_chart(fig, use_container_width=True)
 selected_caseworker = st.selectbox("Select a caseworker to view their errors", case_counts["Caseworker"])
 filtered_df = df[df["Caseworker"] == selected_caseworker]
 st.write(f"Showing all errors for **{selected_caseworker}**:")
-st.dataframe(filtered_df)
+st.dataframe(filtered_df, width = 2000,)
