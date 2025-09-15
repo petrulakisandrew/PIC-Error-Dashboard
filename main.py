@@ -68,47 +68,13 @@ col1, col2, = st.columns(2)
 
 with col1:
     st.subheader("Errors by Caseworker")
-    fig = px.bar(case_counts, x="Caseworker", y="Count", text="Count")
-    fig.update_traces(textposition="outside")
-    fig.update_layout(
-        paper_bgcolor="white",  # background outside the plot
-        plot_bgcolor="white",   # background inside the plot
-        shapes=[
-            dict(
-                type="rect",
-                xref="paper",
-                yref="paper",
-                x0=-0.068,
-                y0=-0.2,
-                x1=1.00,
-                y1=1.18,
-                line=dict(color="grey", width=3)
-            )
-        ]
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    st.bar_chart(data=case_counts.set_index("Caseworker")["Count"])
+
 
 with col2:
     st.subheader("Errors by 58 Action Type")
-    fig2 = px.pie(action_counts, values = "Count", names = "Action Type",)
-    fig2.update_traces(textposition="inside", textinfo="percent+label")
-    fig2.update_layout(
-        paper_bgcolor="white",  # background outside the plot
-        plot_bgcolor="white",   # background inside the plot
-        shapes=[
-            dict(
-                type="rect",
-                xref="paper",
-                yref="paper",
-                x0=-0.00,
-                y0=-0.2,
-                x1=1.00,
-                y1=1.18,
-                line=dict(color="grey", width=3)
-            )
-        ]
-    )
-    st.plotly_chart(fig2, use_container_width=True)
+    action_counts["Percent"] = 100 * action_counts["Count"] / action_counts["Count"].sum()
+    st.table(action_counts[["Action Type", "Count", "Percent"]])
 
 
 # --- Selection: show rows for chosen caseworker ---
