@@ -46,23 +46,29 @@ col1.metric("Total Fatal Errors", df["Error Number"].count())
 today = datetime.today().strftime("%B %d, %Y")
 col2.metric("Date", today)
 
-#Bar Chart for Errors by Caseworker
+#All Counts and Sub DF's
 case_counts = df["Caseworker"].value_counts().reset_index()
 case_counts.columns = ["Caseworker", "Count"]
 
-st.subheader("Errors by Caseworker")
-
-
-fig = px.bar(case_counts, x="Caseworker", y="Count", text="Count")
-fig.update_traces(textposition="outside")
-st.plotly_chart(fig, use_container_width=True)
-
-#Pie Chart for Errors by Action Type
 action_counts = df["Type of Action"].value_counts().reset_index()
 action_counts.columns = ["Action Type", "Count"]
 
-fig2 = px.pie(action_counts, values = "Count", names = "Action Type", title = "Errors by 50058 Action Type")
-st.plotly_chart(fig2, use_container_width=True)
+
+# Side-by-side charts
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("Errors by Caseworker")
+    fig = px.bar(case_counts, x="Caseworker", y="Count", text="Count")
+    fig.update_traces(textposition="outside")
+    st.plotly_chart(fig, use_container_width=True)
+
+with col2:
+    st.subheader("Errors by 58 Action Type")
+    fig2 = px.pie(action_counts, values = "Count", names = "Action Type",)
+    fig2.update_traces(textposition="inside", textinfo="percent+label")
+    st.plotly_chart(fig2, use_container_width=True)
+
 
 # --- Selection: show rows for chosen caseworker ---
 selected_caseworker = st.selectbox("Select a caseworker to view their errors", case_counts["Caseworker"])
