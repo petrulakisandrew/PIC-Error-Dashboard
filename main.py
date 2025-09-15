@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import plotly.express as px
-
+from datetime import datetime
 
 #Initiate GIT
 
@@ -39,9 +39,12 @@ print(df)
 #Header for the Dashboard
 st.markdown("<h1 style='text-align: center;'>PIC Fatal Error Dashboard</h1>", unsafe_allow_html=True)
  
-#Including Total Count of Fatal Errors
-col1, = st.columns(1) 
+#Including Total Count of Fatal Errors and Date
+col1, col2 = st.columns(2) 
 col1.metric("Total Fatal Errors", df["Error Number"].count()) 
+
+today = datetime.today().strftime("%B %d, %Y")
+col2.metric("Date", today)
 
 #Bar Chart for Errors by Caseworker
 case_counts = df["Caseworker"].value_counts().reset_index()
@@ -53,6 +56,13 @@ st.subheader("Errors by Caseworker")
 fig = px.bar(case_counts, x="Caseworker", y="Count", text="Count")
 fig.update_traces(textposition="outside")
 st.plotly_chart(fig, use_container_width=True)
+
+#Pie Chart for Errors by Action Type
+action_counts = df["Type of Action"].value_counts().reset_index()
+action_counts.columns = ["Action Type", "Count"]
+
+fig2 = px.pie(action_counts, values = "Count", names = "Action Type", title = "Errors by 50058 Action Type")
+st.plotly_chart(fig2, use_container_width=True)
 
 # --- Selection: show rows for chosen caseworker ---
 selected_caseworker = st.selectbox("Select a caseworker to view their errors", case_counts["Caseworker"])
