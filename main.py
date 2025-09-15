@@ -36,6 +36,15 @@ df["Caseworker"] = np.select(conditions, caseworkers, default="Other")
 df = df.drop(df[df["Error Type"] == " WARNING"].index)
 print(df)
 
+#Password for Dashboard:
+with open("local_password.txt", "r") as f:
+    PASSWORD = f.read().strip()
+
+password = st.text_input("Enter password", type = "password") 
+if password != PASSWORD:
+    st.warning("Incorrect Password!")
+    st.stop()
+
 #Header for the Dashboard
 st.markdown("<h1 style='text-align: center;'>PIC Fatal Error Dashboard</h1>", unsafe_allow_html=True)
  
