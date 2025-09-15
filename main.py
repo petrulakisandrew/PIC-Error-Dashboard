@@ -52,8 +52,8 @@ case_counts.columns = ["Caseworker", "Count"]
 
 action_counts = df["Type of Action"].value_counts().reset_index()
 action_counts.columns = ["Action Type", "Count"]
-action_counts["Action Type"] = action_counts["Action Type"].astype(str) + " action"
-
+action_counts["Action Type"] = action_counts["Action Type"].astype(str) + " action" 
+ 
 # Side-by-side charts
 col1, col2, = st.columns(2)
 
