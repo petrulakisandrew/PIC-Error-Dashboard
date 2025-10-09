@@ -1,20 +1,26 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
-import plotly.express as px
 from datetime import datetime
+import bcrypt
+import time
+import os
 
-#Initiate GIT
+#Check Login
+if "logged_in" not in st.session_state or st.session_state.logged_in ==  False:
+    st.session_state.logged_in = False
+    st.switch_page("pages/login.py")
+    
 
 #Importing Excel DF
-with open("local_paths.txt", "r") as f:
-    excel_file = f.readline().strip() 
+excel_file = os.getenv("EXCEL_PATH")
+print(excel_file)
       
 df = pd.read_excel(excel_file, header=26)
 
 #Cleaning unused columns
 df = df.drop(["Rec Nbr in Error","Section","Development Number", "Building Number", "Building Number Entrance","Unit Number","PHA Use Only1","PHA Use Only2","PHA Use Only3","PHA Use Only4","PHA Use Only5"], axis=1)
-# print(df.head())
+
 
 #Caseworker Column
 conditions = [
@@ -36,15 +42,8 @@ df["Caseworker"] = np.select(conditions, caseworkers, default="Other")
 df = df.drop(df[df["Error Type"] == " WARNING"].index)
 print(df)
 
-#Password for Dashboard:
-with open("local_password.txt", "r") as f:
-    PASSWORD = f.read().strip()
-
-password = st.text_input("Enter password", type = "password") 
-if password != PASSWORD:
-    st.warning("Incorrect Password!")
-    st.stop()
-
+#Page 2: Content
+        
 #Header for the Dashboard
 st.markdown("<h1 style='text-align: center;'>PIC Fatal Error Dashboard</h1>", unsafe_allow_html=True)
  
@@ -82,3 +81,8 @@ selected_caseworker = st.selectbox("Select a caseworker to view their errors", c
 filtered_df = df[df["Caseworker"] == selected_caseworker]
 st.write(f"Showing all errors for **{selected_caseworker}**:")
 st.dataframe(filtered_df, width = 2000,)
+
+st.set_page_config(
+    page_title="DHA Dashboard",
+    page_icon="./assets/favi.ico"
+)
