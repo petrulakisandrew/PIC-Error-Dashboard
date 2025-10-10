@@ -40,7 +40,7 @@ df["Caseworker"] = np.select(conditions, caseworkers, default="Other")
 
 
 df = df.drop(df[df["Error Type"] == " WARNING"].index)
-print(df)
+
 
 #Page 2: Content
         
@@ -79,6 +79,7 @@ with col1:
 with col2:
     st.subheader("Errors by 58 Action Type")
     action_counts["Percent"] = 100 * action_counts["Count"] / action_counts["Count"].sum()
+    action_counts["Percent"] = action_counts["Percent"].map("{:.2f}%".format)
     st.table(action_counts[["Action Type", "Count", "Percent"]])
 
 

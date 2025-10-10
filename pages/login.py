@@ -22,6 +22,10 @@ def login_attempt(user_input):
         st.session_state.logged_in = False
         st.warning("Incorrect Password")
         st.stop()
+
+#Login Check:
+if "logged_in" not in st.session_state or st.session_state.logged_in ==  False:
+    st.session_state.logged_in = False
     
 #Title for Log-In
 st.title("PIC Error Dashboard Login Page")
@@ -33,6 +37,7 @@ if not st.session_state.logged_in:
     
 if st.session_state.logged_in and st.session_state.logged_in ==  True:
     st.switch_page("./pages/dash.py")
+
     
 
 # st.write(st.session_state.logged_in) 
