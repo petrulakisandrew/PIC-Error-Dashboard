@@ -6,6 +6,39 @@ st.set_page_config(
     layout = "wide"
 )
 
+#Fatal Error Select Box
+fatalerror_dict = {
+    "PIC Error 4174": {
+        "error_desc":"This is a new tenant in IMS-PIC. No 50058 data for the head of household exists. At least one new admission or historical adjustment record must be submitted first.",
+        "link":"https://files.hudexchange.info/resources/documents/PIC-Error-4174-New-Tenant-Job-Aid.pdf"
+    },
+    "PIC Error 4080": {
+        "error_desc":"A record with a later effective date exists in the database. Either remove the later record or change this effective date to a later date.",
+        "link":"https://files.hudexchange.info/resources/documents/PIC-Error-4080-Later-Effective-Date-Job-Aid.pdf"
+    },
+    "PIC Error 5280": {
+        "error_desc":"A record with a later effective date exists in the database. Either remove the later record or change this effective date to a later date.",
+        "link":"https://files.hudexchange.info/resources/documents/PIC-Error-5280-Voucher-Record-Does-Not-Exist-Job-Aid.pdf"
+    },
+    "PIC Error 4182": {
+        "error_desc":"This tenant already exists at this PHA in the IMS-PIC database. New admission cannot be accepted.",
+        "link":"https://files.hudexchange.info/resources/documents/PIC-Error-4182-Tenant-Already-Exists-Job-Aid.pdf"
+    },
+    "PIC Error 4006": {
+        "error_desc":"PHA code for tenant does not match with existing PHA code in database.",
+        "link":"https://files.hudexchange.info/resources/documents/PIC-Error-4006-PHA-Code-Does-Not-Match-Job-Aid.pdf"
+    }
+}
+
+fatal_select = st.selectbox(
+    "Fatal Error Type",
+    fatalerror_dict, width = 350
+)
+
+st.write("Error Description:", fatalerror_dict[fatal_select]["error_desc"])
+
+st.link_button("Go To Solution",fatalerror_dict[fatal_select]["link"])
+
 st.markdown("""
 <style>
 /* ===== Global Page Styling ===== */
@@ -129,27 +162,8 @@ body {
     is critical to maintaining data integrity and compliance.
     </p>
 </div>
-
-<p class='call-to-action'>
-    Please see below for an explanation of each type of fatal error and what it means.
-</p>
 """, unsafe_allow_html=True)
-#Fatal Error DataFram
 
-fatalerror_dict = {
-    "PIC Error 4174":"This is a new tenant in IMS-PIC. No 50058 data for the head of household exists. At least one new admission or historical adjustment record must be submitted first.",
-    "PIC Error 4080":"A record with a later effective date exists in the database. Either remove the later record or change this effective date to a later date.",
-    "PIC Error 5280":"A record with a later effective date exists in the database. Either remove the later record or change this effective date to a later date.",
-    "PIC Error 4182":"This tenant already exists at this PHA in the IMS-PIC database. New admission cannot be accepted.",
-    "PIC Error 4006":"PHA code for tenant does not match with existing PHA code in database."
-}
-
-fatal_select = st.selectbox(
-    "Fatal Error Type",
-    fatalerror_dict, width = 350
-)
-
-st.write("Error Description:", fatalerror_dict[fatal_select])
 
 st.set_page_config(
     page_title="DHA Dashboard",
