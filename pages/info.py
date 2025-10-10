@@ -30,14 +30,6 @@ fatalerror_dict = {
     }
 }
 
-fatal_select = st.selectbox(
-    "Fatal Error Type",
-    fatalerror_dict, width = 350
-)
-
-st.write("Error Description:", fatalerror_dict[fatal_select]["error_desc"])
-
-st.link_button("Go To Solution",fatalerror_dict[fatal_select]["link"])
 
 st.markdown("""
 <style>
@@ -129,7 +121,24 @@ body {
         in the PIC IMS system to maintain compliance and data integrity.
     </h4>
 </div>
+""", unsafe_allow_html=True)
 
+
+with st.container(horizontal_alignment = "center"):
+    fatal_select = st.selectbox(
+        "Fatal Error Type",
+        fatalerror_dict, width = 350
+    )
+
+    st.markdown(
+        f"<p style='text-align: center;'>Error Description: {fatalerror_dict[fatal_select]['error_desc']}</p>",
+        unsafe_allow_html=True
+    )
+
+    st.link_button("Go To Solution",fatalerror_dict[fatal_select]["link"])
+
+
+st.markdown("""
 <div class='section'>
     <h3>Monitoring Fatal Errors in PIC IMS</h3>
     <p>
@@ -138,7 +147,6 @@ body {
     through the PIC secure submission module.
     </p>
 </div>
-
 <div class='divider'></div>
 
 <div class='section'>
