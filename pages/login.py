@@ -13,9 +13,9 @@ def check_password(password):
 def login_attempt(user_input):
     print(f'Login attempt')
     if check_password(user_input):
+        print(f"Password Correct") 
         st.session_state.logged_in = True
-        st.switch_page("./pages/dash.py")
-        # TO DO: Fix redirect to dashboard page -----------------------------------
+        # st.switch_page("./pages/dash.py")
         # st.success("Weclome") 
     else:
         print(f"Password incorrect") 
@@ -30,6 +30,9 @@ st.title("PIC Error Dashboard Login Page")
 if not st.session_state.logged_in:
     user_input = st.text_input("Enter password", type = "password").strip()
     login_button = st.button("Login", on_click = login_attempt, args = (user_input,))
+    
+if st.session_state.logged_in and st.session_state.logged_in ==  True:
+    st.switch_page("./pages/dash.py")
     
 
 # st.write(st.session_state.logged_in) 

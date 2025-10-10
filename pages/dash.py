@@ -45,6 +45,12 @@ print(df)
 #Page 2: Content
         
 #Header for the Dashboard
+
+#Setting Wide Screen Configuration 
+st.set_page_config(
+    layout = "wide"
+)
+
 st.markdown("<h1 style='text-align: center;'>PIC Fatal Error Dashboard</h1>", unsafe_allow_html=True)
  
 #Including Total Count of Fatal Errors and Date
