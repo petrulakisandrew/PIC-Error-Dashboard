@@ -19,6 +19,12 @@ print(excel_file)
       
 df = pd.read_excel(excel_file, header=26)
 
+#Masking SSN in "HOH SSN" column 
+df["HOH SSN"] = df["HOH SSN"].apply(lambda x: '***-**-' + x[6:])
+
+#Masking all SSN's in "Field in Error" Column
+df["Field Contents"] = df["Field Contents"].apply(lambda x: '***-**-' + x[6:] if len(str(x).strip()) ==  9 else x)
+    
 #Cleaning unused columns
 df = df.drop(["Rec Nbr in Error","Section","Development Number", "Building Number", "Building Number Entrance","Unit Number","PHA Use Only1","PHA Use Only2","PHA Use Only3","PHA Use Only4","PHA Use Only5"], axis=1)
 
