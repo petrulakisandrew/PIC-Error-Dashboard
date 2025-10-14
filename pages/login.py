@@ -1,6 +1,8 @@
 import streamlit as st
 import bcrypt
 import os
+from db import log_login
+from datetime import datetime
 
 #Reading hashed password from secure file as universal variable
 PASSWORD = os.getenv("PASSWORD").encode("utf-8")
@@ -37,6 +39,7 @@ if not st.session_state.logged_in:
     login_button = st.button("Login", on_click = login_attempt, args = (user_input,))
     
 if st.session_state.logged_in and st.session_state.logged_in ==  True:
+    log_login("NULL",datetime.utcnow(),"NULL")
     st.switch_page("./pages/dash.py")
 
     

@@ -15,7 +15,7 @@ if "logged_in" not in st.session_state or st.session_state.logged_in ==  False:
 
 #Importing Excel DF
 excel_file = os.getenv("EXCEL_PATH")
-print(excel_file)
+# print(excel_file)
       
 df = pd.read_excel(excel_file, header=26)
 
