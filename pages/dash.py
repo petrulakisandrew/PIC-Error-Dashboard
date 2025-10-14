@@ -5,6 +5,7 @@ from datetime import datetime
 import bcrypt
 import time
 import os
+from nav import navigation
 
 #Check Login
 if "logged_in" not in st.session_state or st.session_state.logged_in ==  False:
@@ -44,7 +45,9 @@ df = df.drop(df[df["Error Type"] == " WARNING"].index)
 
 #Page 2: Content
         
-#Header for the Dashboard
+#Navigation Bar
+with st.sidebar:
+    navigation()
 
 #Setting Wide Screen Configuration 
 st.set_page_config(

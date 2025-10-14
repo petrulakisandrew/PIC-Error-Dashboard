@@ -1,10 +1,15 @@
 import streamlit as st 
 import os
 import pandas as pd
+from nav import navigation
 
 st.set_page_config(
     layout = "wide"
 )
+
+#Navigation Bar:
+with st.sidebar:
+    navigation()
 
 #Fatal Error Select Box
 fatalerror_dict = {
