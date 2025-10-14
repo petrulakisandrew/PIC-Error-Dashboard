@@ -8,10 +8,8 @@ import os
 from nav import navigation
 
 #Check Login
-if "logged_in" not in st.session_state or st.session_state.logged_in ==  False:
-    st.session_state.logged_in = False
+if not st.user.is_logged_in:
     st.switch_page("pages/login.py")
-    
 
 #Importing Excel DF
 excel_file = os.getenv("EXCEL_PATH")
@@ -61,6 +59,8 @@ st.set_page_config(
 )
 
 st.markdown("<h1 style='text-align: center;'>PIC Fatal Error Dashboard</h1>", unsafe_allow_html=True)
+
+st.button("Log out", on_click=st.logout)
  
 #Including Total Count of Fatal Errors and Date
 col1, col2, col3, col4 = st.columns(4) 

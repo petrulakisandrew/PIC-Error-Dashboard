@@ -7,11 +7,13 @@ import os
 load_dotenv()
 
 #Initializing Session
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+if not st.user.is_logged_in:
+    st.switch_page("pages/login.py")
+else:
+    st.switch_page("pages/dash.py")
+
     
-    
-st.switch_page("pages/login.py")
+
 
     
 

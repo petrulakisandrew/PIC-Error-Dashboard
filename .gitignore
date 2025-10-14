@@ -1,3 +1,4 @@
 local_paths.txt
 local_password.txt
 .env
+secrets.toml
