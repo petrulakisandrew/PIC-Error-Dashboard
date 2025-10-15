@@ -9,13 +9,13 @@ from nav import navigation
 
 def display_chat():
     rows = query_message()
-
     message_df = pd.DataFrame(rows, columns = ["First Name","Last Name","Message","Timestamp"])
-    st.dataframe(message_df, width = 2000,)
-    print(message_df)
+    
+    for i, row in message_df.iterrows():
+        with st.chat_message("user"):
+            st.markdown(f"{row['First Name']} : {row['Message']}")
+    # print(message_df)
 
-    
-    
 
 #Checking Log In State
 if not st.user.is_logged_in:
@@ -29,9 +29,6 @@ with st.sidebar:
 #Page Header    
 st.markdown("<h1 style='text-align: center;'>Message Board</h1>", unsafe_allow_html=True)
 
-display_chat()
-
-
 #Chat Message Box
 prompt = st.chat_input(
     "Say something"   
@@ -39,11 +36,8 @@ prompt = st.chat_input(
 
 if prompt:
     log_message(prompt, datetime.now(timezone.utc),st.user.get("name").split(" ")[0], st.user.get("name").split(" ")[-1])
-    st.write(f"{st.user.get('name').split(' ')[0]}: {prompt}")
-    
-message_container = st.container(border = True)
 
-
+display_chat()
 
 st.set_page_config(
     page_title="DHA Dashboard",
