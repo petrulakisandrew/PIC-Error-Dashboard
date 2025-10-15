@@ -61,13 +61,41 @@ db = DatabaseController(
 # Connect to database
 db.connect()
 
-def log_login(email, timestamp, device):
+def log_login(email, timestamp, device, first_name=None, last_name=None):
     try: 
         insert_query = sql.SQL("""
-            INSERT INTO logins (email, timestamp, device)
-            VALUES (%s, %s, %s)
+            INSERT INTO logins (email, timestamp, device, first_name, last_name)
+            VALUES (%s, %s, %s, %s, %s)
         """)
-        db.execute(insert_query, (email, timestamp, device))
+        db.execute(insert_query, (email, timestamp, device, first_name, last_name))
     except Exception as e:
         print("❌ Failed to log login:", e, f'Database Controller State: {db.config}')
     print("Login logged successfully.")
+    
+    
+def log_message(message, timestamp, first=None, last=None):
+    try: 
+        insert_query = sql.SQL("""
+            INSERT INTO messaging (message, timestamp, first, last)
+            VALUES (%s, %s, %s, %s)
+        """)
+        db.execute(insert_query, (message, timestamp, first, last))
+    except Exception as e:
+        print("❌ Failed to log Message:", e, f'Database Controller State: {db.config}')
+    print("Message logged successfully.")
+
+    
+def query_message(first=None, last=None):
+    try: 
+        select_query = sql.SQL("""
+            SELECT * 
+            FROM messaging
+            ORDER BY timestamp ASC
+        """)
+        db.execute(select_query)
+        rows = db.fetchall()
+        return rows
+    except Exception as e:
+        print("❌ Failed to query Messages:", e, f'Database Controller State: {db.config}')
+    print("Messages queried successfully.")
+    

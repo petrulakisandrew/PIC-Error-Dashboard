@@ -17,7 +17,8 @@ if not st.user.is_logged_in:
     st.switch_page("pages/login.py")
 elif st.user.is_logged_in and not st.session_state.login_logged:
     value = browser_detection_engine()
-    log_login(st.user["email"], datetime.now(timezone.utc), value["userAgent"])
+    log_login(st.user["email"], datetime.now(timezone.utc), value["userAgent"],
+        st.user.get("name").split(" ")[0], st.user.get("name").split(" ")[-1])
     st.session_state.login_logged = True
     st.switch_page("pages/dash.py")
 else:
