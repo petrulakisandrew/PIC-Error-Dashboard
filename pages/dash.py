@@ -6,10 +6,18 @@ import bcrypt
 import time
 import os
 from nav import navigation
+from db import log_login
 
-#Check Login
+#Logout Function:
+def handle_logout():
+    st.logout()
+    st.session_state.logged_login = False
+
+
+#Check Login and Logged Login
 if not st.user.is_logged_in:
     st.switch_page("pages/login.py")
+
 
 #Importing Excel DF
 excel_file = os.getenv("EXCEL_PATH")
@@ -58,9 +66,9 @@ st.set_page_config(
     layout = "wide"
 )
 
-st.markdown("<h1 style='text-align: center;'>PIC Fatal Error Dashboard</h1>", unsafe_allow_html=True)
+st.button("Log out", on_click=handle_logout)
 
-st.button("Log out", on_click=st.logout)
+st.markdown("<h1 style='text-align: center;'>PIC Fatal Error Dashboard</h1>", unsafe_allow_html=True)
  
 #Including Total Count of Fatal Errors and Date
 col1, col2, col3, col4 = st.columns(4) 
