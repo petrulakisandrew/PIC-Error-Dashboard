@@ -18,7 +18,6 @@ def handle_logout():
 if not st.user.is_logged_in:
     st.switch_page("pages/login.py")
 
-
 #Importing Excel DF
 excel_file = os.getenv("EXCEL_PATH")
 # print(excel_file)
