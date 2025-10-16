@@ -129,4 +129,17 @@ def query_message(first=None, last=None):
     except Exception as e:
         print("❌ Failed to query Messages:", e)
     print("Messages queried successfully.")
+ 
     
+def check_admin(email, permission = None):
+    try:
+        check_query = sql.SQL("""
+            SELECT 1 FROM user_access WHERE email = %s AND permission = %s
+        """)
+        db.execute(check_query, (email, permission,))
+        user = db.fetchone()
+        return user is not None
+    except Exception as e:
+        print("❌ Failed to check user existence:", e)
+    return False
+  
