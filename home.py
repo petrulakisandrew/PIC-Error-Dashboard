@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 from db import DatabaseController
 import os
 from db import log_login
+from db import user_exists
+from db import log_newuser
 from datetime import datetime, timezone
 from browser_detection import browser_detection_engine
 
@@ -16,9 +18,13 @@ if "login_logged" not in st.session_state:
 if not st.user.is_logged_in:
     st.switch_page("pages/login.py")
 elif st.user.is_logged_in and not st.session_state.login_logged:
+    if user_exists(st.user["email"]) ==  False:
+        log_newuser(st.user["email"],
+            st.user.get("name").split(" ")[0], st.user.get("name").split(" ")[-1])
     value = browser_detection_engine()
     log_login(st.user["email"], datetime.now(timezone.utc), value["userAgent"],
         st.user.get("name").split(" ")[0], st.user.get("name").split(" ")[-1])
+    
     st.session_state.login_logged = True
     st.switch_page("pages/dash.py")
 else:

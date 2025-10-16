@@ -39,6 +39,10 @@ class DatabaseController:
     def fetchall(self):
         """Fetch all rows from the last executed SELECT query."""
         return self.cursor.fetchall() if self.cursor else []
+    
+    def fetchone(self):
+        """Fetch one row from the last executed SELECT query."""
+        return self.cursor.fetchone() if self.cursor else None
 
     def close(self):
         """Close the cursor and database connection."""
@@ -61,6 +65,33 @@ db = DatabaseController(
 # Connect to database
 db.connect()
 
+def user_exists(email):
+    try:
+        check_query = sql.SQL("""
+            SELECT 1 FROM users WHERE email = %s
+        """)
+        db.execute(check_query, (email,))
+        exists = db.fetchone()
+        print(f'{email} already exists') if exists else print(f'{email} does not exist')
+        return exists is not None
+    except Exception as e:
+        print("❌ Failed to check user existence:", e)
+        return False
+  
+    
+def log_newuser(email, first_name=None, last_name=None):
+    try: 
+        insert_query = sql.SQL("""
+            INSERT INTO users (email, first_name, last_name)
+            VALUES (%s, %s, %s)
+        """)
+        db.execute(insert_query, (email, first_name, last_name))
+    except Exception as e:
+        print("❌ Failed to log user:", e)
+    print("User logged successfully.")
+
+
+
 def log_login(email, timestamp, device, first_name=None, last_name=None):
     try: 
         insert_query = sql.SQL("""
@@ -69,7 +100,7 @@ def log_login(email, timestamp, device, first_name=None, last_name=None):
         """)
         db.execute(insert_query, (email, timestamp, device, first_name, last_name))
     except Exception as e:
-        print("❌ Failed to log login:", e, f'Database Controller State: {db.config}')
+        print("❌ Failed to log login:", e)
     print("Login logged successfully.")
     
     
@@ -81,7 +112,7 @@ def log_message(message, timestamp, first=None, last=None):
         """)
         db.execute(insert_query, (message, timestamp, first, last))
     except Exception as e:
-        print("❌ Failed to log Message:", e, f'Database Controller State: {db.config}')
+        print("❌ Failed to log Message:", e)
     print("Message logged successfully.")
 
     
@@ -96,6 +127,6 @@ def query_message(first=None, last=None):
         rows = db.fetchall()
         return rows
     except Exception as e:
-        print("❌ Failed to query Messages:", e, f'Database Controller State: {db.config}')
+        print("❌ Failed to query Messages:", e)
     print("Messages queried successfully.")
     

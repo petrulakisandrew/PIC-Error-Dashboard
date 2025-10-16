@@ -9,6 +9,10 @@ from nav import navigation
 import html as html_utils
 from streamlit.components.v1 import html
 
+st.set_page_config(
+    layout = "wide"
+)
+
 def time_ago(dt):
     """Convert datetime to relative time like '17 minutes ago'."""
     now = datetime.now(dt.tzinfo)
