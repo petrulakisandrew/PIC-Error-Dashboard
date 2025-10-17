@@ -27,10 +27,18 @@ st.markdown("<h1 style='text-align: center;'>Administrative</h1>", unsafe_allow_
 
 user_df = store_users()
 
-#User Select Box
-selected_user = st.selectbox("Select a User to Modify Permissions", user_df["first_name"])
+full_name = user_df["first_name"]+ ' ' + user_df["last_name"]
 
-st.dataframe(user_df, width = 2000,)   
+#User Select Box
+selected_user = st.selectbox("Select a User to Modify Permissions", full_name)
+
+first, last = selected_user.split(" ")
+user_email = user_df[(user_df["first_name"] == first) & (user_df["last_name"] == last)]["email"].values[0]
+st.write(f'User Email: {user_email}')
+
+
+admin_checkbox = st.checkbox("Admin")  
+admin_checkbox = st.checkbox("User")
     
 st.set_page_config(
     page_title="DHA Dashboard",
