@@ -184,14 +184,14 @@ def store_permissions():
 def permission_exists(email, permission):
     try:
         check_query = sql.SQL("""
-            SELECT 1 FROM users WHERE LOWER(email) = %s AND permission = %s
+            SELECT 1 FROM user_access WHERE email = %s AND permission = %s
         """)
         db.execute(check_query, (email, permission))
         permission_exists = db.fetchone()
-        print(f'{permission_exists} already exists') if exists else print(f'{permission_exists} does not exist')
-        return exists is not None
+        print(f'{permission_exists} already exists') if permission_exists else print(f'{permission_exists} does not exist')
+        return permission_exists is not None
     except Exception as e:
-        print("❌ Failed to check user existence:", e)
+        print("❌ Failed to check permission existence:", e)
         return False
     
 
@@ -212,8 +212,8 @@ def add_permissions(email, permission):
 def remove_permissions(email, permission):
     try: 
         delete_query = sql.SQL("""
-            DELETE FROM user_access (email, permission)
-            VALUES (%s, %s)
+            DELETE FROM user_access
+            WHERE email = %s AND permission = %s
         """)
         db.execute(delete_query, (email, permission))
     except Exception as e:
@@ -221,6 +221,25 @@ def remove_permissions(email, permission):
     print("Permission deleted successfully.")
 
     
-    
+def store_user_permissions():
+    try:
+        query = sql.SQL("""
+            SELECT users.email, user_access.permission
+            FROM users
+            LEFT JOIN user_access
+                ON users.email = user_access.email
+        """)
+        db.execute(query)
+        permissions = db.fetchall()
+        user_permissions = {}
+        for row in permissions:
+            email, permission = row
+            if email not in user_permissions:
+                user_permissions[email] = []
+            user_permissions[email].append(permission)
+        
+        return user_permissions
+    except Exception as e:
+        print("❌ Failed to pull user permissons:", e)    
     
   

@@ -6,7 +6,7 @@ from db import add_permissions
 from db import remove_permissions
 from db import store_permissions
 from db import permission_exists
-
+from db import store_user_permissions
 
 
 #Check Login and Logged Login
@@ -26,41 +26,64 @@ st.set_page_config(
 with st.sidebar:
     navigation()
     
-    
+#Header    
 st.markdown("<h1 style='text-align: center;'>Administrative</h1>", unsafe_allow_html=True)    
 
-user_df = store_users()
+store_user_permissions()
 
+#Storing User DataFrame
+user_df = store_users()
 full_name = user_df["first_name"]+ ' ' + user_df["last_name"]
+
 
 #User Select Box
 selected_user = st.selectbox("Select a User to Modify Permissions", full_name)
-
 first, last = selected_user.split(" ")
 user_email = user_df[(user_df["first_name"] == first) & (user_df["last_name"] == last)]["email"].values[0]
 st.write(f'User Email: {user_email}')
 
 
+
+#Check all Existing User Permissions:
+user_permissions = store_user_permissions()
+print(user_permissions)
+
+active_user_permissions = user_permissions[user_email]
+print(active_user_permissions)
+
 #Checkbox for All Permissions
 permissions_df = store_permissions()
 permissions = permissions_df['permission'].tolist()
-
 st.dataframe(permissions_df)
 
 checkbox_permissions = {}
 
 for perm in permissions:
-    checkbox_permissions[perm] = st.checkbox(str(perm))
+    checkbox_permissions[perm] = st.checkbox(
+        label = (str(perm)),
+        value = perm in active_user_permissions
+    )
 
 st.write(checkbox_permissions.items())
 
 
-#Groundwork for Select Logic
-for item, checked in checkbox_permissions.items():
-    if checked:
-        print(f"{item} is checked")
-    else:
-        print(f"{item} is not checked")
+
+# #Groundwork for Select Logic
+# for item, checked in checkbox_permissions.items():
+#     if checked:
+#         if permission_exists(user_email, item) ==  False:
+#             add_permissions(user_email, item)
+#             print("Permission Added Succesfully") 
+#         else:
+#             print("Permission Already Exists")
+#         # print(f"{item} is checked")
+#     else:
+#         if permission_exists(user_email, item) ==  True:
+#             remove_permissions(user_email, item)
+#             print("Permission Removed")
+#         else:
+#             print("Permission Already Removed")
+#         # print(f"{item} is not checked")
     
 
     
