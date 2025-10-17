@@ -107,7 +107,7 @@ def log_login(email, timestamp, device, first_name=None, last_name=None):
 def log_message(message, timestamp, first=None, last=None):
     try: 
         insert_query = sql.SQL("""
-            INSERT INTO messaging (message, timestamp, first, last)
+            INSERT INTO messaging (message, timestamp, first_name, last_name)
             VALUES (%s, %s, %s, %s)
         """)
         db.execute(insert_query, (message, timestamp, first, last))
@@ -134,9 +134,9 @@ def query_message(first=None, last=None):
 def check_admin(email, permission = None):
     try:
         check_query = sql.SQL("""
-            SELECT 1 FROM user_access WHERE email = %s AND permission = %s
+            SELECT 1 FROM user_access WHERE LOWER(email) = %s AND permission = %s
         """)
-        db.execute(check_query, (email, permission,))
+        db.execute(check_query, (email.lower(), permission,))
         user = db.fetchone()
         return user is not None
     except Exception as e:

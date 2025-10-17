@@ -67,6 +67,8 @@ st.set_page_config(
 
 st.button("Log out", on_click=handle_logout)
 
+# st.user
+
 st.markdown("<h1 style='text-align: center;'>PIC Fatal Error Dashboard</h1>", unsafe_allow_html=True)
  
 #Including Total Count of Fatal Errors and Date

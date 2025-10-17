@@ -8,6 +8,7 @@ import os
 from nav import navigation
 import html as html_utils
 from streamlit.components.v1 import html
+from db import check_admin
 
 st.set_page_config(
     layout = "wide"
@@ -200,14 +201,19 @@ with st.sidebar:
 #Page Header    
 st.markdown("<h1 style='text-align: center;'>📢 Announcement Board</h1>", unsafe_allow_html=True)
 
-#Chat Message Box
-prompt = st.chat_input(
-    "Say something"   
-) 
 
-if prompt:
-    prompt = html_utils.escape(prompt)
-    log_message(html_utils.escape(prompt), datetime.now(timezone.utc),st.user.get("name").split(" ")[0], st.user.get("name").split(" ")[-1])
+#Chat Message Box
+if check_admin(st.user["email"],'admin') ==  True:
+    prompt = st.chat_input(
+        "Say something"   
+    ) 
+    if prompt:
+        prompt = html_utils.escape(prompt)
+        log_message(html_utils.escape(prompt), datetime.now(timezone.utc),st.user.get("name").split(" ")[0], st.user.get("name").split(" ")[-1])
+else:
+    st.empty()
+    st.warning("🔒 You do not have permission to post messages.")
+    
 
 display_chat()
 
