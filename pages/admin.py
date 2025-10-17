@@ -27,6 +27,9 @@ st.markdown("<h1 style='text-align: center;'>Administrative</h1>", unsafe_allow_
 
 user_df = store_users()
 
+#User Select Box
+selected_user = st.selectbox("Select a User to Modify Permissions", user_df["first_name"])
+
 st.dataframe(user_df, width = 2000,)   
     
 st.set_page_config(
