@@ -2,6 +2,7 @@ import psycopg2
 from psycopg2 import sql
 import os
 from dotenv import load_dotenv
+import pandas as pd
 
 load_dotenv()
 
@@ -39,6 +40,10 @@ class DatabaseController:
     def fetchall(self):
         """Fetch all rows from the last executed SELECT query."""
         return self.cursor.fetchall() if self.cursor else []
+    
+    def description(self):
+        """Return a list of column names."""
+        return self.cursor.description if self.cursor else []
     
     def fetchone(self):
         """Fetch one row from the last executed SELECT query."""
@@ -142,4 +147,19 @@ def check_admin(email, permission = None):
     except Exception as e:
         print("❌ Failed to check user existence:", e)
     return False
+
+def store_users():
+    try:
+        user_query = sql.SQL("""
+            SELECT * FROM users
+        """)
+        db.execute(user_query)
+        users = db.fetchall()
+        columns = [desc[0] for desc in db.description()]
+        user_df = pd.DataFrame(users, columns = columns)
+        return user_df
+    except Exception as e:
+        print("❌ Failed to pull users:", e)
+    
+    
   

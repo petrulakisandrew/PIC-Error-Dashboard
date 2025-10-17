@@ -1,6 +1,7 @@
 import streamlit as st
 from nav import navigation
 from db import check_admin
+from db import store_users
 
 
 
@@ -23,7 +24,10 @@ with st.sidebar:
     
     
 st.markdown("<h1 style='text-align: center;'>Administrative</h1>", unsafe_allow_html=True)    
-    
+
+user_df = store_users()
+
+st.dataframe(user_df, width = 2000,)   
     
 st.set_page_config(
     page_title="DHA Dashboard",
