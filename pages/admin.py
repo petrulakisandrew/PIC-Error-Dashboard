@@ -2,6 +2,10 @@ import streamlit as st
 from nav import navigation
 from db import check_admin
 from db import store_users
+from db import add_permissions
+from db import remove_permissions
+from db import store_permissions
+from db import permission_exists
 
 
 
@@ -37,8 +41,28 @@ user_email = user_df[(user_df["first_name"] == first) & (user_df["last_name"] ==
 st.write(f'User Email: {user_email}')
 
 
-admin_checkbox = st.checkbox("Admin")  
-admin_checkbox = st.checkbox("User")
+#Checkbox for All Permissions
+permissions_df = store_permissions()
+permissions = permissions_df['permission'].tolist()
+
+st.dataframe(permissions_df)
+
+checkbox_permissions = {}
+
+for perm in permissions:
+    checkbox_permissions[perm] = st.checkbox(str(perm))
+
+st.write(checkbox_permissions.items())
+
+
+#Groundwork for Select Logic
+for item, checked in checkbox_permissions.items():
+    if checked:
+        print(f"{item} is checked")
+    else:
+        print(f"{item} is not checked")
+    
+
     
 st.set_page_config(
     page_title="DHA Dashboard",

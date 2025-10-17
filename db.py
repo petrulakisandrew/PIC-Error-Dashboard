@@ -109,6 +109,7 @@ def log_login(email, timestamp, device, first_name=None, last_name=None):
     print("Login logged successfully.")
     
     
+    
 def log_message(message, timestamp, first=None, last=None):
     try: 
         insert_query = sql.SQL("""
@@ -120,6 +121,7 @@ def log_message(message, timestamp, first=None, last=None):
         print("❌ Failed to log Message:", e)
     print("Message logged successfully.")
 
+    
     
 def query_message(first=None, last=None):
     try: 
@@ -135,6 +137,7 @@ def query_message(first=None, last=None):
         print("❌ Failed to query Messages:", e)
     print("Messages queried successfully.")
  
+ 
     
 def check_admin(email, permission = None):
     try:
@@ -148,6 +151,8 @@ def check_admin(email, permission = None):
         print("❌ Failed to check user existence:", e)
     return False
 
+
+
 def store_users():
     try:
         user_query = sql.SQL("""
@@ -160,6 +165,62 @@ def store_users():
         return user_df
     except Exception as e:
         print("❌ Failed to pull users:", e)
+        
+  
+def store_permissions():
+    try:
+        perm_query = sql.SQL("""
+            SELECT * FROM permissions
+        """)
+        db.execute(perm_query)
+        permissions = db.fetchall()
+        columns = [desc[0] for desc in db.description()]
+        permissions_df = pd.DataFrame(permissions, columns = columns)
+        return permissions_df
+    except Exception as e:
+        print("❌ Failed to pull users:", e)
+        
+        
+def permission_exists(email, permission):
+    try:
+        check_query = sql.SQL("""
+            SELECT 1 FROM users WHERE LOWER(email) = %s AND permission = %s
+        """)
+        db.execute(check_query, (email, permission))
+        permission_exists = db.fetchone()
+        print(f'{permission_exists} already exists') if exists else print(f'{permission_exists} does not exist')
+        return exists is not None
+    except Exception as e:
+        print("❌ Failed to check user existence:", e)
+        return False
+    
+
+        
+def add_permissions(email, permission):
+    try: 
+        insert_query = sql.SQL("""
+            INSERT INTO user_access (email, permission)
+            VALUES (%s, %s)
+        """)
+        db.execute(insert_query, (email, permission))
+    except Exception as e:
+        print("❌ Failed to add permission:", e)
+    print("Permission added successfully.")
+    
+    
+    
+def remove_permissions(email, permission):
+    try: 
+        delete_query = sql.SQL("""
+            DELETE FROM user_access (email, permission)
+            VALUES (%s, %s)
+        """)
+        db.execute(delete_query, (email, permission))
+    except Exception as e:
+        print("❌ Failed to delete permission:", e)
+    print("Permission deleted successfully.")
+
+    
     
     
   
