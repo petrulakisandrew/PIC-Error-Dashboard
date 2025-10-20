@@ -26,8 +26,8 @@ with st.sidebar:
 st.markdown("""
     <div style="
         text-align: center;
-        margin-top: 10px;
-        margin-bottom: 30px;
+        margin-top: -30px;
+        margin-bottom: 5px;
     ">
         <h1 style="
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;

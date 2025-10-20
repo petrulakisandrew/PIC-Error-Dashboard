@@ -48,8 +48,7 @@ body {
 /* ===== Hero Section ===== */
 .hero {
     text-align: center;
-    margin-top: 30px;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
 }
 
 .hero h1 {
@@ -57,6 +56,7 @@ body {
     color: #93C5FD;
     font-weight: 800;
     letter-spacing: 1px;
+    margin-top: -30px;
     margin-bottom: 10px;
 }
 
