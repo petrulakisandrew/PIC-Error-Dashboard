@@ -76,17 +76,33 @@ active_user_permissions = user_permissions[user_email]
 #Checkbox for All Permissions
 permissions_df = store_permissions()
 permissions = permissions_df['permission'].tolist()
-st.data_editor(permissions_df, hide_index = True)
+permissions_df["active"] = permissions_df["permission"].isin(active_user_permissions)
 
-checkbox_permissions = {}
 
-for perm in permissions:
-    checkbox_permissions[perm] = st.checkbox(
-        label = (str(perm)),
-        value = perm in active_user_permissions
-    )
+edited_df = st.data_editor(
+    permissions_df,
+    column_config = {
+        "permission": st.column_config.TextColumn(
+            "Permission",
+            help = "Permission titles",
+            disabled = True
+        ),
+        "description": st.column_config.TextColumn(
+            "Description",
+            help = "Description of each permission available",
+            disabled = True
+        ),
+        "active": st.column_config.CheckboxColumn(
+            "Active",
+            help = "Enable or disable this permission for the user"
+        )
+    },
+    hide_index = True
+)
 
-# st.write(checkbox_permissions.items())
+
+checkbox_permissions = dict(zip(edited_df["permission"], edited_df["active"]))
+
 
 st.button(label = "Apply Changes", on_click = apply_updates)
     
