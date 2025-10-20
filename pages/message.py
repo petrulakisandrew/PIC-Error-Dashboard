@@ -8,7 +8,7 @@ import os
 from nav import navigation
 import html as html_utils
 from streamlit.components.v1 import html
-from db import check_admin
+from db import check_permission
 
 st.set_page_config(
     layout = "wide"
@@ -203,7 +203,7 @@ st.markdown("<h1 style='text-align: center;'>📢 Announcement Board</h1>", unsa
 
 
 #Chat Message Box
-if check_admin(st.user["email"],'admin') ==  True:
+if check_permission(st.user["email"],'send_bulletin') ==  True:
     prompt = st.chat_input(
         "Say something"   
     ) 

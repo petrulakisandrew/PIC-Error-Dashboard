@@ -139,7 +139,7 @@ def query_message(first=None, last=None):
  
  
     
-def check_admin(email, permission = None):
+def check_permission(email, permission = None):
     try:
         check_query = sql.SQL("""
             SELECT 1 FROM user_access WHERE LOWER(email) = %s AND permission = %s
