@@ -51,7 +51,7 @@ with st.sidebar:
     navigation()
     
 #Header    
-st.markdown("<h1 style='text-align: center;'>Administrative</h1>", unsafe_allow_html=True)    
+st.markdown("<h1 style='text-align: center;'>User Permissions</h1>", unsafe_allow_html=True)    
 
 #Storing User DataFrame
 user_df = store_users()

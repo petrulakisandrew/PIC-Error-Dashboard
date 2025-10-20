@@ -241,5 +241,20 @@ def store_user_permissions():
         return user_permissions
     except Exception as e:
         print("❌ Failed to pull user permissons:", e)    
+        
+
+def query_logins():
+    try: 
+        select_query = sql.SQL("""
+            SELECT * 
+            FROM logins
+            ORDER BY timestamp DESC
+        """)
+        db.execute(select_query)
+        rows = db.fetchall()
+        return rows
+    except Exception as e:
+        print("❌ Failed to query Messages:", e)
+    print("Messages queried successfully.")
     
   

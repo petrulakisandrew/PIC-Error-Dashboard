@@ -105,7 +105,7 @@ with col2:
 selected_caseworker = st.selectbox("Select a caseworker to view their errors", case_counts["Caseworker"])
 filtered_df = df[df["Caseworker"] == selected_caseworker]
 st.write(f"Showing all errors for **{selected_caseworker}**:")
-st.dataframe(filtered_df, width = 2000,)
+st.dataframe(filtered_df, width = 2000, hide_index = True)
 
 st.set_page_config(
     page_title="DHA Dashboard",
