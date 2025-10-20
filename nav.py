@@ -1,7 +1,12 @@
 import streamlit as st
 from db import check_permission
 
+def handle_logout():
+    st.logout()
+    st.session_state.logged_login = False
+
 def navigation():
+        st.button("Log out", on_click=handle_logout)
         st.sidebar.page_link("pages/dash.py", label="Fatal Error Dashboard")
         st.sidebar.page_link("pages/message.py", label="Announcement Board")
         st.sidebar.page_link("pages/info.py", label="Information")

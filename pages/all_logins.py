@@ -23,7 +23,35 @@ with st.sidebar:
     navigation()
     
 #Header    
-st.markdown("<h1 style='text-align: center;'>Recent Logins</h1>", unsafe_allow_html=True)    
+st.markdown("""
+    <div style="
+        text-align: center;
+        margin-top: 10px;
+        margin-bottom: 30px;
+    ">
+        <h1 style="
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 600;
+            font-size: 2.2em;
+            color: white;
+            margin-bottom: 12px;
+        ">
+            Recent Logins
+        </h1>
+        <div style="
+            width: 60%;
+            height: 2px;
+            margin: 0 auto;
+            background: linear-gradient(
+                to right,
+                rgba(0,0,0,0),
+                rgba(100,149,237,0.75),
+                rgba(0,0,0,0)
+            );
+            border-radius: 1px;
+        "></div>
+    </div>
+""", unsafe_allow_html=True)
 
 #Login Data Query
 login_df = pd.DataFrame(query_logins())

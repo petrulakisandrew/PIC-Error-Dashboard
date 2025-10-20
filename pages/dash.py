@@ -8,11 +8,6 @@ import os
 from nav import navigation
 from db import log_login
 
-#Logout Function:
-def handle_logout():
-    st.logout()
-    st.session_state.logged_login = False
-
 
 #Check Login and Logged Login
 if not st.user.is_logged_in:
@@ -65,11 +60,36 @@ st.set_page_config(
     layout = "wide"
 )
 
-st.button("Log out", on_click=handle_logout)
 
-# st.user
-
-st.markdown("<h1 style='text-align: center;'>PIC Fatal Error Dashboard</h1>", unsafe_allow_html=True)
+st.markdown("""
+    <div style="
+        text-align: center;
+        margin-top: 10px;
+        margin-bottom: 30px;
+    ">
+        <h1 style="
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 600;
+            font-size: 2.2em;
+            color: white;
+            margin-bottom: 12px;
+        ">
+            PIC Fatal Error Dashboard
+        </h1>
+        <div style="
+            width: 60%;
+            height: 2px;
+            margin: 0 auto;
+            background: linear-gradient(
+                to right,
+                rgba(0,0,0,0),
+                rgba(100,149,237,0.75),
+                rgba(0,0,0,0)
+            );
+            border-radius: 1px;
+        "></div>
+    </div>
+""", unsafe_allow_html=True) 
  
 #Including Total Count of Fatal Errors and Date
 col1, col2, col3, col4 = st.columns(4) 
