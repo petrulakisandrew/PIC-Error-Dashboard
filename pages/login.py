@@ -3,6 +3,13 @@ import os
 from db import log_login
 from datetime import datetime, timezone
 
+#Page Config
+st.set_page_config(
+    layout = "wide",
+    page_title="PIC Error Dashboard Login",
+    page_icon = "./assets/favi.ico",
+)
+
 #Title for Log-In
 st.title("PIC Error Dashboard Login Page")
 

@@ -10,6 +10,21 @@ from db import store_user_permissions
 import time
 
 
+#Check Login and Logged Login
+if not st.user.is_logged_in:
+    st.switch_page("pages/login.py")
+
+#Check if User is Admin:
+if check_permission(st.user["email"],'admin') ==  False:
+    st.switch_page("pages/dash.py")
+
+#Page Config
+st.set_page_config(
+    layout = "wide",
+    page_title="User Permissions",
+    page_icon = "./assets/favi.ico",
+)
+
 def apply_updates():
     try:
         for item, checked in checkbox_permissions.items():
@@ -33,18 +48,6 @@ def apply_updates():
 
     
 
-#Check Login and Logged Login
-if not st.user.is_logged_in:
-    st.switch_page("pages/login.py")
-
-#Check if User is Admin:
-if check_permission(st.user["email"],'admin') ==  False:
-    st.switch_page("pages/dash.py")
-
-#Page Config
-st.set_page_config(
-    layout = "wide"
-)
 
 #Navigation Bar:
 with st.sidebar:
@@ -133,10 +136,3 @@ checkbox_permissions = dict(zip(edited_df["permission"], edited_df["active"]))
 
 
 st.button(label = "Apply Changes", on_click = apply_updates)
-    
-
-    
-st.set_page_config(
-    page_title="DHA Dashboard",
-    page_icon="./assets/favi.ico"
-)

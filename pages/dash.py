@@ -13,6 +13,13 @@ from db import log_login
 if not st.user.is_logged_in:
     st.switch_page("pages/login.py")
 
+#Page Config
+st.set_page_config(
+    layout = "wide",
+    page_title="PIC Fatal Error Dashboard",
+    page_icon = "./assets/favi.ico",
+)
+
 #Importing Excel DF
 excel_file = os.getenv("EXCEL_PATH")
 # print(excel_file)
@@ -54,11 +61,6 @@ df = df.drop(df[df["Error Type"] == " WARNING"].index)
 #Navigation Bar
 with st.sidebar:
     navigation()
-
-#Setting Wide Screen Configuration 
-st.set_page_config(
-    layout = "wide"
-)
 
 
 st.markdown("""
@@ -128,9 +130,4 @@ st.write(f"Showing all errors for **{selected_caseworker}**:")
 st.dataframe(filtered_df, 
     width = 2000, 
     hide_index = True
-)
-
-st.set_page_config(
-    page_title="DHA Dashboard",
-    page_icon="./assets/favi.ico"
 )

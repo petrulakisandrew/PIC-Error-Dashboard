@@ -14,6 +14,13 @@ load_dotenv()
 if "login_logged" not in st.session_state:
     st.session_state.login_logged = False
 
+#Page Config
+st.set_page_config(
+    layout = "wide",
+    page_title="PIC Error Dashboard",
+    page_icon = "./assets/favi.ico",
+)
+
 #Initializing Session
 if not st.user.is_logged_in:
     st.switch_page("pages/login.py")

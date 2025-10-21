@@ -305,5 +305,19 @@ def insert_vendor(landlord, request_date, requester, vcode, w9, fed_class, owner
     except Exception as e:
         print("❌ Failed to log Vendor Request:", e)
     print("Vendor Request logged successfully.")
+   
     
-  
+def query_vendor_requests():
+    try: 
+        select_query = sql.SQL("""
+            SELECT * 
+            FROM vendor_requests
+            ORDER BY compliance_date DESC
+        """)
+        db.execute(select_query)
+        rows = db.fetchall()
+        return rows
+    except Exception as e:
+        print("❌ Failed to query Messages:", e)
+    print("Messages queried successfully.")
+   

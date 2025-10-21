@@ -3,8 +3,11 @@ import os
 import pandas as pd
 from nav import navigation
 
+#Page Config
 st.set_page_config(
-    layout = "wide"
+    layout = "wide",
+    page_title="PIC IMS Fatal Error Guide",
+    page_icon = "./assets/favi.ico",
 )
 
 #Navigation Bar:
@@ -176,9 +179,3 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
-
-
-st.set_page_config(
-    page_title="DHA Dashboard",
-    page_icon="./assets/favi.ico"
-)

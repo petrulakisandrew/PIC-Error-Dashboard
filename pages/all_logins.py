@@ -15,7 +15,9 @@ if check_permission(st.user["email"],'admin') ==  False:
     
 #Page Config
 st.set_page_config(
-    layout = "wide"
+    layout = "wide",
+    page_title="Recent Logins",
+    page_icon = "./assets/favi.ico",
 )
 
 #Navigation Bar:

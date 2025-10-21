@@ -10,8 +10,11 @@ import html as html_utils
 from streamlit.components.v1 import html
 from db import check_permission
 
+#Page Config
 st.set_page_config(
-    layout = "wide"
+    layout = "wide",
+    page_title="Announcement Board",
+    page_icon = "./assets/favi.ico",
 )
 
 def time_ago(dt):
@@ -216,8 +219,3 @@ else:
     
 
 display_chat()
-
-st.set_page_config(
-    page_title="DHA Dashboard",
-    page_icon="./assets/favi.ico"
-)
