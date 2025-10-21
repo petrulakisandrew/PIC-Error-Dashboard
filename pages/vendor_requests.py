@@ -1,6 +1,8 @@
 import streamlit as st
 from nav import navigation
 import pandas as pd
+from db import insert_vendor
+from datetime import datetime
 
 #Check Login and Logged Login
 if not st.user.is_logged_in:
@@ -81,3 +83,5 @@ st.data_editor(
     hide_index = True,
     num_rows = "dynamic"
 )
+
+# insert_vendor('test', datetime(2025, 10, 21, 15, 30, 0), 'test', 'test', True, 'test', True, True, True, True, True, 'test', datetime(2025, 10, 21, 15, 30, 0), 'test', True, datetime(2025, 10, 21, 15, 30, 0), 'test')

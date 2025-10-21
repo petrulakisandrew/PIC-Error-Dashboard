@@ -256,5 +256,54 @@ def query_logins():
     except Exception as e:
         print("❌ Failed to query Messages:", e)
     print("Messages queried successfully.")
+   
+    
+def insert_vendor(landlord, request_date, requester, vcode, w9, fed_class, ownership_proof, owner_declaration, disclosure, direct_deposit, canceled_check, creator, compliance_date, approver, status, approved_date, email):
+    try: 
+        insert_query = sql.SQL("""
+            INSERT INTO vendor_requests (
+            landlord, 
+            request_date, 
+            requester, 
+            vcode,
+            w9,
+            fed_class,
+            ownership_proof,
+            owner_declaration,
+            disclosure,
+            direct_deposit,
+            canceled_check,
+            creator,
+            compliance_date,
+            approver,
+            status,
+            approved_date,
+            email
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """)
+        db.execute(insert_query, (
+            landlord, 
+            request_date, 
+            requester, 
+            vcode, 
+            w9, 
+            fed_class, 
+            ownership_proof, 
+            owner_declaration, 
+            disclosure, 
+            direct_deposit, 
+            canceled_check, 
+            creator, 
+            compliance_date, 
+            approver, 
+            status, 
+            approved_date, 
+            email
+            )
+            )
+    except Exception as e:
+        print("❌ Failed to log Vendor Request:", e)
+    print("Vendor Request logged successfully.")
     
   
