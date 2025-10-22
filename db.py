@@ -258,7 +258,7 @@ def query_logins():
     print("Messages queried successfully.")
    
     
-def insert_vendor(landlord, request_date, requester, vcode, w9, fed_class, ownership_proof, owner_declaration, disclosure, direct_deposit, canceled_check, creator, compliance_date, approver, status, approved_date, email):
+def insert_vendor(landlord, request_date, requester, vcode, w9, fed_class, ownership_proof, owner_declaration, disclosure, direct_deposit, canceled_check, creator, compliance_date, approver, status, approved_date, email, request_id):
     try: 
         insert_query = sql.SQL("""
             INSERT INTO vendor_requests (
@@ -278,9 +278,10 @@ def insert_vendor(landlord, request_date, requester, vcode, w9, fed_class, owner
             approver,
             status,
             approved_date,
-            email
+            email,
+            request_id
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """)
         db.execute(insert_query, (
             landlord, 
@@ -299,20 +300,32 @@ def insert_vendor(landlord, request_date, requester, vcode, w9, fed_class, owner
             approver, 
             status, 
             approved_date, 
-            email
+            email,
+            request_id
             )
             )
     except Exception as e:
         print("❌ Failed to log Vendor Request:", e)
     print("Vendor Request logged successfully.")
-   
+
+def update_vendor_cell(request_id, column_name, new_value):
+    try: 
+        update_query = sql.SQL("""
+            UPDATE vendor_requests
+            SET {column} = %s
+            WHERE request_id = %s
+        """).format(column=sql.Identifier(column_name))
+        db.execute(update_query, (new_value, request_id))
+    except Exception as e:
+        print("❌ Failed to update Vendor Request:", e)
+    print("Vendor Request updated successfully.")
     
 def query_vendor_requests():
     try: 
         select_query = sql.SQL("""
             SELECT * 
             FROM vendor_requests
-            ORDER BY compliance_date DESC
+            ORDER BY request_date ASC
         """)
         db.execute(select_query)
         rows = db.fetchall()
