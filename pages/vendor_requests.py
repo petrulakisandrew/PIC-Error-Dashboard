@@ -7,6 +7,22 @@ from datetime import datetime
 from util.helpers import generate_random_id
 import time
 
+st.markdown("""
+    <style>
+    [data-testid="stBaseButton-tertiary"] {
+        background-color: #0088FF !important;
+        color: white !important;
+    }
+    [data-testid="stBaseButton-tertiary"]:hover {
+        background-color: #006FCC !important;
+        color: white !important;
+    }
+            
+
+    </style>
+    """, unsafe_allow_html=True
+)
+
 COLUMN_MAP = {
     "Landlord/Owner/Agent": "landlord",
     "Request Received Date": "request_date",
@@ -42,7 +58,8 @@ REQUIRED_FIELDS =[
 def is_missing_required_fields(row):
     for field in REQUIRED_FIELDS:
         if pd.isna(row[field]) or row[field] == '':
-            return True
+            return (True, field)
+    return (False, None)
 
 # Page Config
 st.set_page_config(
@@ -124,7 +141,7 @@ def refresh_from_database():
         
 def clear_input():
     st.session_state.editor_reset_counter += 1
-    
+    st.rerun()
 
 # Initialize data ONLY on first load
 if "vendor_data_initialized" not in st.session_state:
@@ -133,20 +150,37 @@ if "vendor_data_initialized" not in st.session_state:
 
 if "editor_reset_counter" not in st.session_state:
     st.session_state.editor_reset_counter = 0
+
+if "save_armed" not in st.session_state:
+    st.session_state.save_armed = False
+
+if "message" not in st.session_state:
+    st.session_state.message = None
+
+if "message_type" not in st.session_state:
+    st.session_state.message_type = None
     
 
 # Header
 st.title("Vendor Approval Requests")
 
+if st.session_state.message:
+    if st.session_state.message_type == "success":
+        st.success(st.session_state.message)
+    elif st.session_state.message_type == "error":
+        st.error(st.session_state.message)
+    st.session_state.message = None
+    st.session_state.message_type = None
+
 # Controls
 col1, col2 = st.columns([1, 5])
 with col1:
-    st.button("🔄 Refresh from Database", on_click=refresh_from_database)
+    st.button("Refresh Data", on_click=refresh_from_database, icon=":material/refresh:")
 
 # Display count
 st.write(f"**Total Requests:** {len(st.session_state.vendor_data)}")
 
-editor_key = f"vendor_editor_reset{st.session_state.editor_reset_counter}" if st.session_state.editor_reset_counter >= 0 else "vendor_editor"
+editor_key = f"vendor_editor_reset{st.session_state.editor_reset_counter}"
 print(editor_key)
 
 # Data Editor
@@ -269,10 +303,18 @@ edited_df = st.data_editor(
 
 # Save section
 st.divider()
-col1, col2 = st.columns([1, 5])
-with col1:
-    with st.popover("Options", icon=":material/transgender:"):
-        if st.button("Save", type="primary", icon=":material/save:"):
+
+if not st.session_state.save_armed:
+    # Normal save state - single centered button
+    col1, col2, col3 = st.columns([2, 1, 2])
+    with col2:
+        if st.button("**Save Changes**", type="tertiary", use_container_width=True, icon=":material/save:"):
+            st.session_state.save_armed = True
+            st.rerun()
+else:
+    col1, col2, col3, col4 = st.columns([2, 1, 1, 2])
+    with col2:
+        if st.button("**Confirm**", type="tertiary", use_container_width=True, icon=":material/check:"):
             try:
                 original_df = st.session_state.vendor_data
                 merged_df = edited_df.merge(original_df[['Request ID']], on = 'Request ID', how = 'left', indicator = True, suffixes = ('_old','_new'))
@@ -282,16 +324,28 @@ with col1:
 
                 new_rows = edited_df[new_rows_mask].copy()
                 existing_rows = edited_df[existing_rows_mask].copy()
-
-                for idx, row in new_rows.iterrows():
-                    if is_missing_required_fields(row):
-                        st.toast(f"Error Applying Updates", duration = 'short', icon = ":material/error_outline:")
-                        raise Exception("❌ Missing required fields in new rows.")
                 
+                missing_row = (False, None)
+                has_missing_fields = False
+                
+                for idx, row in new_rows.iterrows():
+                    missing_row = is_missing_required_fields(row)
+                    if missing_row[0]:
+                        st.session_state.save_armed = False
+                        st.session_state.message = f"❌ New Row {idx + 1} is missing required field: {missing_row[1]}"
+                        st.session_state.message_type = "error"
+                        has_missing_fields = True                
+
                 for idx, row in existing_rows.iterrows():
-                    if is_missing_required_fields(row):
-                        st.toast(f"Error Applying Updates", duration = 'short', icon = ":material/error_outline:")
-                        raise Exception("❌ Missing required fields in existing rows.")
+                    missing_row = is_missing_required_fields(row)
+                    if missing_row[0]:
+                        st.session_state.save_armed = False
+                        st.session_state.message = f"❌ Existing Row {idx + 1} is missing required field: {missing_row[1]}"
+                        st.session_state.message_type = "error"
+                        has_missing_fields = True
+                
+                if has_missing_fields:
+                    st.rerun()
                     
                 for idx, row in new_rows.iterrows():
                     if pd.isna(row['Request ID']):
@@ -328,12 +382,35 @@ with col1:
                         if edited_row[column] != original_row[column]:
                             update_vendor_cell(request_id, db_column, edited_row[column])
                             count += 1
-                            
-                st.session_state.vendor_data = edited_df.copy()
-                st.rerun()
+
+                if new_rows.empty and count == 0:
+                    st.session_state.save_armed = False
+                    st.session_state.message = "⚠️ No changes detected to save."
+                    st.session_state.message_type = "error"
+                    st.rerun()
+
+                if has_missing_fields == False:         
+                    st.session_state.vendor_data = edited_df.copy()
+                    st.session_state.save_armed = False
+                    st.session_state.message = f"✅ Successfully saved changes to database! ({len(new_rows)} new requests, {count} updated fields)"
+                    st.session_state.message_type = "success"
+                    st.rerun()
+                    
             except Exception as e:
-                st.error(f"❌ Error saving to database: {str(e)}")
-        st.button("Clear User Input", on_click = clear_input)
+                st.session_state.save_armed = False
+                st.session_state.message = f"❌ Error saving changes to database: {str(e)}"
+                st.session_state.message_type = "error"
+                st.rerun()
+    
+    with col3:
+        if st.button("Cancel", use_container_width=True, icon=":material/close:", type="primary"):
+            st.session_state.save_armed = False
+            st.rerun()
+
+col1, col2, col3 = st.columns([2, 1, 2])
+with col2:
+    if st.button("**Undo Edits**", type="secondary",use_container_width=True, icon=":material/delete_history:"):
+        clear_input()
 
         
 
