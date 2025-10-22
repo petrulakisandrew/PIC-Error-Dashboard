@@ -162,7 +162,35 @@ if "message_type" not in st.session_state:
     
 
 # Header
-st.title("Vendor Approval Requests")
+st.markdown("""
+    <div style="
+        text-align: center;
+        margin-top: -30px;
+        margin-bottom: 5px;
+    ">
+        <h1 style="
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 600;
+            font-size: 2.2em;
+            color: white;
+            margin-bottom: 12px;
+        ">
+            Vendor Approval Requests
+        </h1>
+        <div style="
+            width: 60%;
+            height: 2px;
+            margin: 0 auto;
+            background: linear-gradient(
+                to right,
+                rgba(0,0,0,0),
+                rgba(100,149,237,0.75),
+                rgba(0,0,0,0)
+            );
+            border-radius: 1px;
+        "></div>
+    </div>
+""", unsafe_allow_html=True) 
 
 if st.session_state.message:
     if st.session_state.message_type == "success":
@@ -172,13 +200,12 @@ if st.session_state.message:
     st.session_state.message = None
     st.session_state.message_type = None
 
-# Controls
-col1, col2 = st.columns([1, 5])
-with col1:
-    st.button("Refresh Data", on_click=refresh_from_database, icon=":material/refresh:")
-
 # Display count
-st.write(f"**Total Requests:** {len(st.session_state.vendor_data)}")
+col1, col2, col3, = st.columns([5, 40, 5])
+with col1:
+    st.write(f"**Total Requests:** {len(st.session_state.vendor_data)}")
+with col3:
+    st.button("Refresh Data", on_click=refresh_from_database, icon=":material/refresh:")
 
 editor_key = f"vendor_editor_reset{st.session_state.editor_reset_counter}"
 print(editor_key)
