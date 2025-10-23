@@ -234,6 +234,8 @@ edited_df = st.data_editor(
             "⚫",
             help="Status: 🟢 Approved | 🔴 Pending",
             width="small",
+            pinned=True,
+            default="🔴",
             disabled=True,
         ),
         "Landlord/Owner/Agent": st.column_config.TextColumn(
@@ -442,7 +444,9 @@ if check_permission(st.user["email"],'vendor_request'):
                         request_id = edited_row['Request ID']
                         original_row = original_df[original_df['Request ID'] == request_id].iloc[0]
                         for column in edited_df.columns:
-                            db_column = COLUMN_MAP[column]
+                            if column == '⚫':
+                                continue
+                            db_column = COLUMN_MAP.get(column)
                             if not db_column or db_column == 'request_id':
                                 continue
                             if edited_row[column] != original_row[column]:
