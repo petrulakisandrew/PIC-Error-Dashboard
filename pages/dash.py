@@ -8,6 +8,7 @@ import os
 from nav import navigation
 from db import log_login
 import glob
+from db import check_permission
 
 
 #Check Login and Logged Login
@@ -23,32 +24,40 @@ st.set_page_config(
 
 
 def file_path_creation(directory, file_name, file):
+    if not check_permission(st.user["email"],'update_PIC_data'):
+        st.warning("You do not have permissions to update the PIC Error Dashboard Data")
+        return
     os.makedirs(directory, exist_ok = True)
     file_path = os.path.join(directory, file_name)
     print(file_path)
     with open(file_path, 'wb') as f:
         f.write(file.getbuffer())
     st.success(f'File {file_name} has been saved to {directory}')
+        
     
 
 #Dialog Box
 @st.dialog("Choose Current  PIC Error File", width = 'large', on_dismiss = 'rerun')
 def file():
+    if not check_permission(st.user["email"],'update_PIC_data'):
+        st.warning("You do not have permissions to update the PIC Error Dashboard Data")
+        return
+    
     current_excel_file = st.file_uploader("Browse Machine for Files Below", type = 'xlsx')
     
     if current_excel_file is not None:
         print(current_excel_file.name)
         df = pd.read_excel(current_excel_file)
         st.write(df)
-        if st.user['email'] == 'Petrulakisandrew@gmail.com' and st.user["oid"] == "00000000-0000-0000-56f2-9fdf9261e520":
-            st.button(
-                "Confirm Upload?", 
-                on_click = file_path_creation(
-                    os.getenv("TARGET_DIRECTORY"), 
-                    current_excel_file.name, 
-                    current_excel_file
-                )
+        
+        st.button(
+            "Confirm Upload?", 
+            on_click = file_path_creation(
+                os.getenv("TARGET_DIRECTORY"), 
+                current_excel_file.name, 
+                current_excel_file
             )
+        )
     else:
         st.warning("⚠️ No File Currently Selected")
 
@@ -132,7 +141,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True) 
 
-if st.user['email'] == 'Petrulakisandrew@gmail.com' and st.user["oid"] == "00000000-0000-0000-56f2-9fdf9261e520":
+if check_permission(st.user["email"],'update_PIC_data'):
     st.button("Upload File", on_click= file, type = 'primary', help = "Change The Error Data this Dashboard is Diplaying")
     
 #Including Total Count of Fatal Errors and Date
