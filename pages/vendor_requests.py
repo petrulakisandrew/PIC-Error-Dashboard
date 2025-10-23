@@ -5,6 +5,7 @@ from db import insert_vendor, update_vendor_cell
 from db import query_vendor_requests
 from datetime import datetime
 from util.helpers import generate_random_id
+from db import check_permission
 import time
 
 st.markdown("""
@@ -160,7 +161,6 @@ if "message" not in st.session_state:
 if "message_type" not in st.session_state:
     st.session_state.message_type = None
     
-
 # Header
 st.markdown("""
     <div style="
@@ -331,113 +331,114 @@ edited_df = st.data_editor(
 # Save section
 st.divider()
 
-if not st.session_state.save_armed:
-    # Normal save state - single centered button
-    col1, col2, col3 = st.columns([2, 1, 2])
-    with col2:
-        if st.button("**Save Changes**", type="tertiary", use_container_width=True, icon=":material/save:"):
-            st.session_state.save_armed = True
-            st.rerun()
-else:
-    col1, col2, col3, col4 = st.columns([2, 1, 1, 2])
-    with col2:
-        if st.button("**Confirm**", type="tertiary", use_container_width=True, icon=":material/check:"):
-            try:
-                original_df = st.session_state.vendor_data
-                merged_df = edited_df.merge(original_df[['Request ID']], on = 'Request ID', how = 'left', indicator = True, suffixes = ('_old','_new'))
-                
-                new_rows_mask = merged_df['_merge'] ==  'left_only'
-                existing_rows_mask = merged_df['_merge'] == 'both'
-
-                new_rows = edited_df[new_rows_mask].copy()
-                existing_rows = edited_df[existing_rows_mask].copy()
-                
-                missing_row = (False, None)
-                has_missing_fields = False
-                
-                for idx, row in new_rows.iterrows():
-                    missing_row = is_missing_required_fields(row)
-                    if missing_row[0]:
-                        st.session_state.save_armed = False
-                        st.session_state.message = f"❌ New Row {idx + 1} is missing required field: {missing_row[1]}"
-                        st.session_state.message_type = "error"
-                        has_missing_fields = True                
-
-                for idx, row in existing_rows.iterrows():
-                    missing_row = is_missing_required_fields(row)
-                    if missing_row[0]:
-                        st.session_state.save_armed = False
-                        st.session_state.message = f"❌ Existing Row {idx + 1} is missing required field: {missing_row[1]}"
-                        st.session_state.message_type = "error"
-                        has_missing_fields = True
-                
-                if has_missing_fields:
-                    st.rerun()
+if check_permission(st.user["email"],'vendor_request'):
+    if not st.session_state.save_armed:
+        # Normal save state - single centered button
+        col1, col2, col3 = st.columns([2, 1, 2])
+        with col2:
+            if st.button("**Save Changes**", type="tertiary", use_container_width=True, icon=":material/save:"):
+                st.session_state.save_armed = True
+                st.rerun()
+    else:
+        col1, col2, col3, col4 = st.columns([2, 1, 1, 2])
+        with col2:
+            if st.button("**Confirm**", type="tertiary", use_container_width=True, icon=":material/check:"):
+                try:
+                    original_df = st.session_state.vendor_data
+                    merged_df = edited_df.merge(original_df[['Request ID']], on = 'Request ID', how = 'left', indicator = True, suffixes = ('_old','_new'))
                     
-                for idx, row in new_rows.iterrows():
-                    if pd.isna(row['Request ID']):
-                        row['Request ID'] = generate_random_id(16)
-                    insert_vendor(
-                        landlord=row['Landlord/Owner/Agent'],
-                        request_date=row['Request Received Date'],
-                        requester=row['Requester'],
-                        vcode=row['V-Code Created/Used'],
-                        w9=row['W-9'],
-                        fed_class=row['Federal Tax Class'],
-                        ownership_proof=row['Proof of Ownership'],
-                        owner_declaration=row['Owner Declaration'],
-                        disclosure=row['Economic Disclosure Statement'],
-                        direct_deposit=row['Direct Deposit Authorization'],
-                        canceled_check=row['Canceled Check or Similar'],
-                        creator=row['Creator'],
-                        compliance_date=row['Sent to Compliance for Approval Date'],
-                        approver=row['Approver'],
-                        status=row['Status'],
-                        approved_date=row['Approval Date'],
-                        email=st.user["email"],
-                        request_id=row['Request ID']
-                    )
-                
-                count = 0
-                for idx, edited_row in existing_rows.iterrows():
-                    request_id = edited_row['Request ID']
-                    original_row = original_df[original_df['Request ID'] == request_id].iloc[0]
-                    for column in edited_df.columns:
-                        db_column = COLUMN_MAP[column]
-                        if not db_column or db_column == 'request_id':
-                            continue
-                        if edited_row[column] != original_row[column]:
-                            update_vendor_cell(request_id, db_column, edited_row[column])
-                            count += 1
+                    new_rows_mask = merged_df['_merge'] ==  'left_only'
+                    existing_rows_mask = merged_df['_merge'] == 'both'
 
-                if new_rows.empty and count == 0:
+                    new_rows = edited_df[new_rows_mask].copy()
+                    existing_rows = edited_df[existing_rows_mask].copy()
+                    
+                    missing_row = (False, None)
+                    has_missing_fields = False
+                    
+                    for idx, row in new_rows.iterrows():
+                        missing_row = is_missing_required_fields(row)
+                        if missing_row[0]:
+                            st.session_state.save_armed = False
+                            st.session_state.message = f"❌ New Row {idx + 1} is missing required field: {missing_row[1]}"
+                            st.session_state.message_type = "error"
+                            has_missing_fields = True                
+
+                    for idx, row in existing_rows.iterrows():
+                        missing_row = is_missing_required_fields(row)
+                        if missing_row[0]:
+                            st.session_state.save_armed = False
+                            st.session_state.message = f"❌ Existing Row {idx + 1} is missing required field: {missing_row[1]}"
+                            st.session_state.message_type = "error"
+                            has_missing_fields = True
+                    
+                    if has_missing_fields:
+                        st.rerun()
+                        
+                    for idx, row in new_rows.iterrows():
+                        if pd.isna(row['Request ID']):
+                            row['Request ID'] = generate_random_id(16)
+                        insert_vendor(
+                            landlord=row['Landlord/Owner/Agent'],
+                            request_date=row['Request Received Date'],
+                            requester=row['Requester'],
+                            vcode=row['V-Code Created/Used'],
+                            w9=row['W-9'],
+                            fed_class=row['Federal Tax Class'],
+                            ownership_proof=row['Proof of Ownership'],
+                            owner_declaration=row['Owner Declaration'],
+                            disclosure=row['Economic Disclosure Statement'],
+                            direct_deposit=row['Direct Deposit Authorization'],
+                            canceled_check=row['Canceled Check or Similar'],
+                            creator=row['Creator'],
+                            compliance_date=row['Sent to Compliance for Approval Date'],
+                            approver=row['Approver'],
+                            status=row['Status'],
+                            approved_date=row['Approval Date'],
+                            email=st.user["email"],
+                            request_id=row['Request ID']
+                        )
+                    
+                    count = 0
+                    for idx, edited_row in existing_rows.iterrows():
+                        request_id = edited_row['Request ID']
+                        original_row = original_df[original_df['Request ID'] == request_id].iloc[0]
+                        for column in edited_df.columns:
+                            db_column = COLUMN_MAP[column]
+                            if not db_column or db_column == 'request_id':
+                                continue
+                            if edited_row[column] != original_row[column]:
+                                update_vendor_cell(request_id, db_column, edited_row[column])
+                                count += 1
+
+                    if new_rows.empty and count == 0:
+                        st.session_state.save_armed = False
+                        st.session_state.message = "⚠️ No changes detected to save."
+                        st.session_state.message_type = "error"
+                        st.rerun()
+
+                    if has_missing_fields == False:         
+                        st.session_state.vendor_data = edited_df.copy()
+                        st.session_state.save_armed = False
+                        st.session_state.message = f"✅ Successfully saved changes to database! ({len(new_rows)} new requests, {count} updated fields)"
+                        st.session_state.message_type = "success"
+                        st.rerun()
+                        
+                except Exception as e:
                     st.session_state.save_armed = False
-                    st.session_state.message = "⚠️ No changes detected to save."
+                    st.session_state.message = f"❌ Error saving changes to database: {str(e)}"
                     st.session_state.message_type = "error"
                     st.rerun()
-
-                if has_missing_fields == False:         
-                    st.session_state.vendor_data = edited_df.copy()
-                    st.session_state.save_armed = False
-                    st.session_state.message = f"✅ Successfully saved changes to database! ({len(new_rows)} new requests, {count} updated fields)"
-                    st.session_state.message_type = "success"
-                    st.rerun()
-                    
-            except Exception as e:
+        
+        with col3:
+            if st.button("Cancel", use_container_width=True, icon=":material/close:", type="primary"):
                 st.session_state.save_armed = False
-                st.session_state.message = f"❌ Error saving changes to database: {str(e)}"
-                st.session_state.message_type = "error"
                 st.rerun()
-    
-    with col3:
-        if st.button("Cancel", use_container_width=True, icon=":material/close:", type="primary"):
-            st.session_state.save_armed = False
-            st.rerun()
 
-col1, col2, col3 = st.columns([2, 1, 2])
-with col2:
-    if st.button("**Undo Edits**", type="secondary",use_container_width=True, icon=":material/delete_history:"):
-        clear_input()
+    col1, col2, col3 = st.columns([2, 1, 2])
+    with col2:
+        if st.button("**Undo Edits**", type="secondary",use_container_width=True, icon=":material/delete_history:"):
+            clear_input()
 
         
 
