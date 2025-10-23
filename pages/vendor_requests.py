@@ -144,6 +144,13 @@ def clear_input():
     st.session_state.editor_reset_counter += 1
     st.rerun()
 
+def vendor_approver():
+    return check_permission(st.user["email"],'vendor_approval')
+
+def vendor_requester():
+    return check_permission(st.user["email"],'vendor_request')
+    
+
 # Initialize data ONLY on first load
 if "vendor_data_initialized" not in st.session_state:
     st.session_state.vendor_data_initialized = True
@@ -210,6 +217,12 @@ with col3:
 editor_key = f"vendor_editor_reset{st.session_state.editor_reset_counter}"
 print(editor_key)
 
+#Check if User is an Approver
+is_approver = vendor_approver()
+
+#Check if User is a Requester:
+is_requester = vendor_requester()
+
 # Data Editor
 edited_df = st.data_editor(
     st.session_state.vendor_data,
@@ -220,29 +233,34 @@ edited_df = st.data_editor(
             help="Vendor From Yardi Voyager",
             max_chars=120,
             required= True,
+            disabled = not is_requester,
         ),
         "Request Received Date": st.column_config.DateColumn(
             "Request Received Date",
             help="Date Request Was Received in Voyager",
             format="YYYY-MM-DD",
             required= True,
+            disabled = not is_requester,
         ),
         "Requester": st.column_config.TextColumn(
             "Requester",
             help="Initial Requester for Vendor Approval",
             max_chars=60,
             required= True,
+            disabled = not is_requester,
         ),
         "V-Code Created/Used": st.column_config.TextColumn(
             "V-Code Created/Used",
             help="Created V-Code for Vendor",
             max_chars=8,
             required= True,
+            disabled = not is_requester,
         ),
         "W-9": st.column_config.CheckboxColumn(
             "W-9",
             help="Check if W-9 Exists",
             default=False,
+            disabled = not is_requester,
         ),
         "Federal Tax Class": st.column_config.SelectboxColumn(
             "Federal Tax Class",
@@ -257,63 +275,75 @@ edited_df = st.data_editor(
                 "Other"
             ],
             required= True,
+            disabled = not is_requester,
         ),
         "Proof of Ownership": st.column_config.CheckboxColumn(
             "Proof of Ownership",
             help="Check if Proof of Ownership Exists",
             default=False,
+            disabled = not is_requester,
         ),
         "Owner Declaration": st.column_config.CheckboxColumn(
             "Owner Declaration",
             help="Check if Owner Declaration Exists",
             default=False,
+            disabled = not is_requester,
         ),
         "Economic Disclosure Statement": st.column_config.CheckboxColumn(
             "Economic Disclosure Statement",
             help="Check if Economic Disclosure Statement Exists",
             default=False,
+            disabled = not is_requester,
         ),
         "Direct Deposit Authorization": st.column_config.CheckboxColumn(
             "Direct Deposit Authorization",
             help="Check if Direct Deposit Authorization Exists",
             default=False,
+            disabled = not is_requester,
         ),
         "Canceled Check or Similar": st.column_config.CheckboxColumn(
             "Canceled Check or Similar",
             help="Check if a Canceled Check or Similar Exists",
             default=False,
+            disabled = not is_requester,
         ),
         "Creator": st.column_config.TextColumn(
             "Creator",
             help="Creator of Vendor Approval Request",
             max_chars=60,
             required= True,
+            disabled = not is_requester,
         ),
         "Sent to Compliance for Approval Date": st.column_config.DateColumn(
             "Sent to Compliance for Approval Date",
             help="Date Request Was Sent to Compliance",
             format="YYYY-MM-DD",
             required= True,
+            disabled = not is_requester,
         ),
         "Approver": st.column_config.TextColumn(
             "Approver",
             help="Name of Vendor Request Approver",
             max_chars=60,
+            disabled = not is_approver,
         ),
         "Status": st.column_config.CheckboxColumn(
             "Status",
             help="Request Approval Status (Approved = True)",
             default=False,
+            disabled = not is_approver,
         ),
         "Approval Date": st.column_config.DateColumn(
             "Approval Date",
             help="Date Request Was Approved by Compliance",
             format="YYYY-MM-DD",
+            disabled = not is_approver,
         ),
         "User Email": st.column_config.TextColumn(
             "User Email",
             help="Email of Vendor Request Creator",
             max_chars=120,
+            disabled = True
         ),
         "Request ID": st.column_config.TextColumn(
             "Request ID",
