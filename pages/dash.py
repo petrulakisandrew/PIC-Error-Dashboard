@@ -7,6 +7,7 @@ import time
 import os
 from nav import navigation
 from db import log_login
+import glob
 
 
 #Check Login and Logged Login
@@ -20,8 +21,46 @@ st.set_page_config(
     page_icon = "./assets/favi.ico",
 )
 
+
+def file_path_creation(directory, file_name, file):
+    os.makedirs(directory, exist_ok = True)
+    file_path = os.path.join(directory, file_name)
+    print(file_path)
+    with open(file_path, 'wb') as f:
+        f.write(file.getbuffer())
+    st.success(f'File {file_name} has been saved to {directory}')
+    
+
+#Dialog Box
+@st.dialog("Choose Current  PIC Error File", width = 'large', on_dismiss = 'rerun')
+def file():
+    current_excel_file = st.file_uploader("Browse Machine for Files Below", type = 'xlsx')
+    
+    if current_excel_file is not None:
+        print(current_excel_file.name)
+        df = pd.read_excel(current_excel_file)
+        st.write(df)
+        if st.user['email'] == 'Petrulakisandrew@gmail.com' and st.user["oid"] == "00000000-0000-0000-56f2-9fdf9261e520":
+            st.button(
+                "Confirm Upload?", 
+                on_click = file_path_creation(
+                    os.getenv("TARGET_DIRECTORY"), 
+                    current_excel_file.name, 
+                    current_excel_file
+                )
+            )
+    else:
+        st.warning("⚠️ No File Currently Selected")
+
+
 #Importing Excel DF
-excel_file = os.getenv("EXCEL_PATH")
+directory = os.getenv("TARGET_DIRECTORY")
+all_files = glob.glob(os.path.join(directory, "*.xlsx"))
+
+if not all_files:
+    raise FileNotFoundError("No Valid Files Found")
+    
+excel_file = max(all_files, key = os.path.getmtime)
 # print(excel_file)
       
 df = pd.read_excel(excel_file, header=26)
@@ -92,7 +131,10 @@ st.markdown("""
         "></div>
     </div>
 """, unsafe_allow_html=True) 
- 
+
+if st.user['email'] == 'Petrulakisandrew@gmail.com' and st.user["oid"] == "00000000-0000-0000-56f2-9fdf9261e520":
+    st.button("Upload File", on_click= file, type = 'primary', help = "Change The Error Data this Dashboard is Diplaying")
+    
 #Including Total Count of Fatal Errors and Date
 col1, col2, col3, col4 = st.columns(4) 
 col1.metric("Total Fatal Errors", df["Error Number"].count()) 
