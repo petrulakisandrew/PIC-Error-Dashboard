@@ -130,6 +130,8 @@ def load_data_from_db():
         if column in df.columns:
             df[column] = df[column].apply(lambda v: None if pd.isna(v) else bool(v))
     
+    df.insert(0, '⚫', df['Status'].apply(lambda x: '🟢' if x else '🔴'))
+
     return df
 
 
@@ -208,11 +210,11 @@ if st.session_state.message:
     st.session_state.message_type = None
 
 # Display count
-col1, col2, col3, = st.columns([5, 40, 5])
+col1, col2, col3, = st.columns([5, 40, 10])
 with col1:
     st.write(f"**Total Requests:** {len(st.session_state.vendor_data)}")
 with col3:
-    st.button("Refresh Data", on_click=refresh_from_database, icon=":material/refresh:")
+    st.button("Refresh Data", on_click=refresh_from_database, icon=":material/refresh:", width=500)
 
 editor_key = f"vendor_editor_reset{st.session_state.editor_reset_counter}"
 print(editor_key)
@@ -228,6 +230,12 @@ edited_df = st.data_editor(
     st.session_state.vendor_data,
     key= editor_key,
     column_config={
+        "⚫️": st.column_config.TextColumn(
+            "⚫",
+            help="Status: 🟢 Approved | 🔴 Pending",
+            width="small",
+            disabled=True,
+        ),
         "Landlord/Owner/Agent": st.column_config.TextColumn(
             "Landlord/Owner/Agent",
             help="Vendor From Yardi Voyager",

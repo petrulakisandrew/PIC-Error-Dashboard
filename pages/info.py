@@ -143,7 +143,7 @@ with st.container(horizontal_alignment = "center"):
         unsafe_allow_html=True
     )
 
-    st.link_button("Go To Solution",fatalerror_dict[fatal_select]["link"])
+    st.link_button("Go To Solution",fatalerror_dict[fatal_select]["link"], type = 'primary')
 
 
 st.markdown("""
