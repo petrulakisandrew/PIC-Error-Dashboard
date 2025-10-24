@@ -226,6 +226,13 @@ is_approver = vendor_approver()
 #Check if User is a Requester:
 is_requester = vendor_requester()
 
+#Creating Dropdown
+search = st.text_input("Filter by Request")
+
+if search:
+    mask = st.session_state.vendor_data.applymap(lambda x: search in str(x).lower()).any(axis = 1)
+    st.session_state.vendor_data = st.session_state.vendor_data[mask]
+
 # Data Editor
 edited_df = st.data_editor(
     st.session_state.vendor_data,
