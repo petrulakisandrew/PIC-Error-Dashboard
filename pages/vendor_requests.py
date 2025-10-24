@@ -7,6 +7,7 @@ from datetime import datetime
 from util.helpers import generate_random_id
 from db import check_permission
 import time
+import streamlit.components.v1 as components
 
 st.markdown("""
     <style>
@@ -368,6 +369,23 @@ edited_df = st.data_editor(
     width='stretch',
 )
 
+scroll_script ="""
+    <script>
+    const scrollToBottom = () => {
+        const scrollContainer = window.parent.document.querySelector('.dvn-scroller');
+        if (scrollContainer) {
+            scrollContainer.scrollTo({
+                top: scrollContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    setTimeout(scrollToBottom, 1000);
+    </script>
+    """
+components.html(scroll_script, height=0, width=0)
+
 # Save section
 st.divider()
 
@@ -479,7 +497,7 @@ if check_permission(st.user["email"],'vendor_request'):
 
     col1, col2, col3 = st.columns([2, 1, 2])
     with col2:
-        if st.button("**Undo Edits**", type="secondary",use_container_width=True, icon=":material/delete_history:"):
+        if st.button("**Undo All Edits**", type="secondary",use_container_width=True, icon=":material/delete_history:"):
             clear_input()
 
         
