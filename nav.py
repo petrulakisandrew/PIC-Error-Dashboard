@@ -1,5 +1,7 @@
 import streamlit as st
 from db import check_permission
+from util.helpers import vendor_status_badge
+
 
 def handle_logout():
     st.logout()
@@ -8,7 +10,7 @@ def handle_logout():
 def navigation():
         st.button("Log out", on_click=handle_logout)
         st.sidebar.page_link("pages/dash.py", label="Fatal Error Dashboard")
-        st.sidebar.page_link("pages/vendor_requests.py", label="Vendor Approval Requests")
+        st.sidebar.page_link("pages/vendor_requests.py", label="Vendor Approval Requests", icon = vendor_status_badge())
         st.sidebar.page_link("pages/message.py", label="Announcement Board")
         st.sidebar.page_link("pages/info.py", label="Information")
         if check_permission(st.user["email"],'admin'):

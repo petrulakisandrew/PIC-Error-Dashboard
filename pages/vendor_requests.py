@@ -211,15 +211,14 @@ if st.session_state.message:
     st.session_state.message_type = None
 
 # Display count
-col1, col2, col3, = st.columns([5, 50, 10])
+col1, col2, col3, = st.columns([10, 70, 15])
 with col1:
     st.write(f"**Total Requests:** {len(st.session_state.vendor_data)}")
 with col2:
-    if '🔴' in st.session_state.vendor_data['Status']:
+    if (st.session_state.vendor_data['Status'] ==  False).any():
         st.badge("Pending Requests", icon=":material/schedule:", color = 'red')
     else:
-        st.badge("No Pending Requests", icon=":material/check:", color="green")
-        
+        st.badge("No Pending Requests", icon=":material/check:", color="green")       
 with col3:
     st.button("Refresh Data", on_click=refresh_from_database, icon=":material/refresh:", width=500)
 

@@ -333,4 +333,18 @@ def query_vendor_requests():
     except Exception as e:
         print("❌ Failed to query Messages:", e)
     print("Messages queried successfully.")
+    
+    
+def check_pending_vendor():
+    try: 
+        select_query = sql.SQL("""
+            SELECT status 
+            FROM vendor_requests
+        """)
+        db.execute(select_query)
+        rows = db.fetchall()
+        return rows
+    except Exception as e:
+        print("❌ Failed to query Messages:", e)
+    print("Messages queried successfully.")
    
