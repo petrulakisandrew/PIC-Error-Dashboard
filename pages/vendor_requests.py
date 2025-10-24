@@ -211,9 +211,15 @@ if st.session_state.message:
     st.session_state.message_type = None
 
 # Display count
-col1, col2, col3, = st.columns([5, 40, 10])
+col1, col2, col3, = st.columns([5, 50, 10])
 with col1:
     st.write(f"**Total Requests:** {len(st.session_state.vendor_data)}")
+with col2:
+    if '🔴' in st.session_state.vendor_data['Status']:
+        st.badge("Pending Requests", icon=":material/schedule:", color = 'red')
+    else:
+        st.badge("No Pending Requests", icon=":material/check:", color="green")
+        
 with col3:
     st.button("Refresh Data", on_click=refresh_from_database, icon=":material/refresh:", width=500)
 
@@ -225,6 +231,7 @@ is_approver = vendor_approver()
 
 #Check if User is a Requester:
 is_requester = vendor_requester()
+
 
 #Creating Dropdown
 search = st.text_input("Filter by Request")
