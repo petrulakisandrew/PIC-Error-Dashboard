@@ -13,6 +13,7 @@ def navigation():
         st.sidebar.page_link("pages/vendor_requests.py", label="Vendor Approval Requests", icon = vendor_status_badge())
         st.sidebar.page_link("pages/message.py", label="Announcement Board")
         st.sidebar.page_link("pages/info.py", label="Information")
+        st.sidebar.page_link("pages/tax_abatement.py", label="Tax Abatement Program")
         if check_permission(st.user["email"],'admin'):
             with st.sidebar.expander("Admin"):
                 st.page_link("pages/admin.py", label="Permissions")

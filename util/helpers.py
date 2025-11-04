@@ -14,3 +14,4 @@ def vendor_status_badge():
             return "⚠️"
     
     return "✅"
+    

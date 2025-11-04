@@ -216,7 +216,7 @@ with col1:
     st.write(f"**Total Requests:** {len(st.session_state.vendor_data)}")
 with col2:
     if (st.session_state.vendor_data['Status'] ==  False).any():
-        st.badge("Pending Requests", icon=":material/schedule:", color = 'red')
+        st.badge(f'{(st.session_state.vendor_data["Status"] ==  False).sum()} Pending Requests', icon=":material/schedule:", color = 'red')
     else:
         st.badge("No Pending Requests", icon=":material/check:", color="green")       
 with col3:
