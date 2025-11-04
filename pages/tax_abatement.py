@@ -1,5 +1,7 @@
 import streamlit as st
 from nav import navigation
+import requests
+import pandas as pd
 
 #Check Login and Logged Login
 if not st.user.is_logged_in:
@@ -16,7 +18,27 @@ st.set_page_config(
 # Navigation Bar
 with st.sidebar:
     navigation()
-    
+
+census_url = "https://geocoding.geo.census.gov/geocoder/geographies/onelineaddress"
+parcel_url = "https://gis.dupageco.org/arcgis/rest/services/ParcelSearch/DuPageAssessmentParcelViewer/MapServer/4/query"
+
+def fetch_api_data(url, params, fields):
+    try:
+        response = requests.get(url, params=params)
+        data = response.json()
+        
+        result = {}
+        for key, path in fields.items():
+            value = data
+            for step in path:
+                value = value[step]
+            result[key] = value
+        return result, None
+    except (KeyError, IndexError, TypeError):
+        return None, f"No data found for {'Parcel Index Number' if 'parcel_owner' in fields else 'Applicant Address'}" 
+    except Exception as e:
+        return None, str(e)
+   
 def census_tract_check(census_tract):
     if census_tract not in dha_non_eligible_census:
         return f'Census Tract {census_tract} does not exist in the list of ineligible census tracts.'
@@ -24,51 +46,213 @@ def census_tract_check(census_tract):
         return f'Census Tract {census_tract} exists in the list of ineligible census tracts.'   
 
 
-dha_non_eligible_township = {"Wayne": False, 
-                             "Bloomingdale": False,
-                             "Winfield": False
-                            }  
+def township_check(township):
+    if township not in dha_non_eligible_township:
+        return f'Township {township} does not exist in the list of ineligible townships.'
+    else:
+        return f'Township {township} exists in the list of ineligible townships.'
+    
+    
+def parcel_check(parcel_number):
+    if parcel_number not in dha_non_eligible_parcels:
+        return f'Parcel Index Number {parcel_number} does not exist in the list of ineligible Parcel Index Numbers.'
+    else:
+        return f'Parcel Index Number {parcel_number} exists in the list of Parcel Index Numbers.'
+    
 
-dha_non_eligible_census = {"8401.04": False, 
-                            "8403.03": False, 
-                            "8407.04": False, 
-                            "8408.02": False, 
-                            "8409.04": False, 
-                            "8411.02": False, 
-                            "8411.08": False, 
-                            "8412.08": False,
-                            "8412.1": False, 
-                            "8413.12": False, 
-                            "8413.13": False, 
-                            "8415.03": False,
-                            "8416.03": False, 
-                            "8416.04": False, 
-                            "8416.05": False, 
-                            "8416.07": False,
-                            "8417.05": False, 
-                            "8417.06": False, 
-                            "8417.08": False, 
-                            "8426.04": False,
-                            "8427.1": False, 
-                            "8436.01": False, 
-                            "8443.06": False, 
-                            "8443.08": False,
-                            "8443.09": False, 
-                            "8444.02": False, 
-                            "8449.02": False, 
-                            "8450": False,
-                            "8455.06": False, 
-                            "8458.03": False, 
-                            "8459.02": False, 
-                            "8461.02": False,
-                            "8463.12": False, 
-                            "8464.1": False, 
-                            "8465.04": False, 
-                            "8465.13": False,
-                            "8465.15": False, 
-                            "8466.03": False, 
-                            "8467.01": False 
-                        }
+def street_check(street_name, parcel_number, parcel_address):
+    if street_name.lower() in parcel_address.lower():
+        return f'Street Address {street_name} Exists Under Parcel Index Number {parcel_number}'
+    else:
+        return f'Street Address {street_name} Does Not Exists Under Parcel Index Number {parcel_number}'
+    
+
+def check_application(township, census_tract, parcel_number, tenant_name, applicant):
+    
+    census_data = fetch_api_data(
+        census_url,
+        {
+        "address": address,
+        "benchmark": "4",
+        "vintage": 4,
+        "format": "json",
+        },
+        {
+        "township_data": [
+            'result', 'addressMatches', 0,
+            'geographies', 'County Subdivisions', 0, 'NAME'
+        ],
+        "census_data": [
+            "result", "addressMatches", 0,
+            "geographies", "Census Tracts", 0, "NAME"
+        ],
+    }
+    )
+    
+    parcel_data = fetch_api_data(
+        parcel_url,
+        {
+            "where": f"PIN = '{parcel_number}'", 
+            "outFields": "BILLNAME, PROPSTNAME", 
+            "returnGeometry": "false", 
+            "f": "json"
+        },
+        {
+        "parcel_owner": [
+            "features", 0 ,"attributes","BILLNAME"
+        ],
+        "parcel_address": [
+            "features", 0 ,"attributes","PROPSTNAME"
+        ],
+    }
+    )
+
+    if parcel_data[1] or census_data[1]:
+        warning_message = parcel_data[1] if parcel_data[1] else census_data[1]
+        st.warning(f'Error fetching data: {warning_message}')
+        return
+
+    print(f'data: {parcel_data}, {census_data}')
+    
+    parcel_owner = parcel_data[0]['parcel_owner']
+    parcel_address = parcel_data[0]['parcel_address']
+    township_data = census_data[0]['township_data']
+    census_data = census_data[0]['census_data']
+    
+    eligible = True
+    
+    if township in dha_non_eligible_township:
+        eligible = False
+    if census_tract in dha_non_eligible_census:
+        eligible = False
+    if township.lower() not in township_data.lower():
+        eligible = False
+    if census_tract.lower() not in census_data.lower():
+        eligible = False
+    if parcel_number in dha_non_eligible_parcels:
+        eligible = False
+    if street_name.lower() not in parcel_address.lower():
+        eligible = False
+    if int(unit_count) > 2 and (int(eligible_units)/int(unit_count) > 0.2):
+        eligible = False
+    
+    if eligible:
+        st.write("✅ APPLICATION IS ELIGIBLE")
+
+        table_compare = {
+            "Application": [
+                township,
+                census_tract,
+                street_name,
+                applicant,
+            ],
+            "API Checks":[
+                township_data,
+                census_data,
+                parcel_address,
+                parcel_owner
+            ]
+        }
+        st.table(table_compare)
+        st.write("Total Units:".ljust(30) + str(unit_count).ljust(30) + "| Eligible Units: " + str(eligible_units))
+        st.write("Unit Ratio:".ljust(30) + f"{(int(eligible_units)/int(unit_count))*100:.2f}%")
+        
+        st.write("✅ OTHER CHECKS".center(90))
+        
+        st.write(census_tract_check(census_tract))
+        st.write(township_check(township))
+        st.write(parcel_check(parcel_number))
+        st.write(street_check(street_name, parcel_number, parcel_address))
+
+        st.write("UNIT & ADDRESS DETAILS".center(90))
+        df = pd.DataFrame({
+            "PIN": [parcel_number],
+            "Unit Count": [unit_count],
+            "Eligible Units": [eligible_units],
+            "% Qualify": [f'{(int(eligible_units)/int(unit_count))*100:.2f}%'],
+            "Street Address": [street_name],
+            "City": [city_name],
+            "State": [state_name],
+            "Zip Code": [zip_code],
+            "Tenant Name": [tenant_name]
+        })
+        st.table(df)
+        return
+    else:
+        st.write("❌ APPLICATION NOT ELIGIBLE".center(90))
+
+        table_compare = {
+            "Application": [
+                township,
+                census_tract,
+                street_name,
+                applicant,
+            ],
+            "API Checks":[
+                township_data,
+                census_data,
+                parcel_address,
+                parcel_owner
+            ]
+        }
+        st.table(table_compare)
+        st.write("Total Units:".ljust(30) + str(unit_count).ljust(30) + "| Eligible Units: " + str(eligible_units))
+        st.write("Unit Ratio:".ljust(30) + f"{(int(eligible_units)/int(unit_count))*100:.2f}%")
+        
+        st.write("✅ OTHER CHECKS".center(90))
+        
+        st.write(census_tract_check(census_tract))
+        st.write(township_check(township))
+        st.write(parcel_check(parcel_number))
+        st.write(street_check(street_name, parcel_number))
+
+dha_non_eligible_township = {
+    "Wayne": False, 
+    "Bloomingdale": False,
+    "Winfield": False
+}  
+
+dha_non_eligible_census = {
+    "8401.04": False, 
+    "8403.03": False, 
+    "8407.04": False, 
+    "8408.02": False, 
+    "8409.04": False, 
+    "8411.02": False, 
+    "8411.08": False, 
+    "8412.08": False,
+    "8412.1": False, 
+    "8413.12": False, 
+    "8413.13": False, 
+    "8415.03": False,
+    "8416.03": False, 
+    "8416.04": False, 
+    "8416.05": False, 
+    "8416.07": False,
+    "8417.05": False, 
+    "8417.06": False, 
+    "8417.08": False, 
+    "8426.04": False,
+    "8427.1": False, 
+    "8436.01": False, 
+    "8443.06": False, 
+    "8443.08": False,
+    "8443.09": False, 
+    "8444.02": False, 
+    "8449.02": False, 
+    "8450": False,
+    "8455.06": False, 
+    "8458.03": False, 
+    "8459.02": False, 
+    "8461.02": False,
+    "8463.12": False, 
+    "8464.1": False, 
+    "8465.04": False, 
+    "8465.13": False,
+    "8465.15": False, 
+    "8466.03": False, 
+    "8467.01": False 
+}
 
 dha_non_eligible_parcels = {
     "0309306018": False,
@@ -263,17 +447,33 @@ dha_non_eligible_parcels = {
     "0832110073": False
 }
 
-
 st.header("Tax Abatement")
+    
+col1, col2, = st.columns([1.5, 5])
 
-township = st.text_input("Township", width = 400)
-census_tract = st.text_input("Census Tract", width = 400)
-parcel_number = st.text_input("Parcel Index Number", width = 400)
-tenant_name = st.text_input("Tenant Name", width = 400)
-applicant = st.text_input("Applicant Name", width = 400)
-street_name = st.text_input("Street Name", width = 400)
-city_name = st.text_input("City Name", width = 400)
-state_name = st.text_input("State Name", width = 400)
-zip_code = st.text_input("Zip Code", width = 400)
-unit_count = st.text_input("Unit Count", width = 400)
-eligible_units = st.text_input("Eligible Units", width = 400)
+with col1:
+    township = st.text_input("Township", width = 400)
+    census_tract = st.text_input("Census Tract", width = 400)
+    parcel_number = st.text_input("Parcel Index Number", width = 400)
+    tenant_name = st.text_input("Tenant Name", width = 400)
+    applicant = st.text_input("Applicant Name", width = 400)
+    street_name = st.text_input("Street Name", width = 400)
+    city_name = st.text_input("City Name", width = 400)
+    state_name = st.text_input("State Name", width = 400)
+    zip_code = st.text_input("Zip Code", width = 400)
+    unit_count = st.text_input("Unit Count", width = 400)
+    eligible_units = st.text_input("Eligible Units", width = 400)
+
+#Applicant Full Address
+address = f'{street_name} {city_name} {state_name} {zip_code}'
+
+with col2:
+    st.button(label = "Run Application Check", on_click = check_application, args = (township, census_tract, parcel_number, tenant_name, applicant))
+
+
+
+
+
+
+
+
