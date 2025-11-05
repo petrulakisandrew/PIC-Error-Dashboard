@@ -124,7 +124,7 @@ def check_application(township, census_tract, parcel_number, tenant_name, applic
     if township in dha_non_eligible_township:
         eligible = False
     if census_tract in dha_non_eligible_census:
-        eligible = False
+        eligible = False 
     if township.lower() not in township_data.lower():
         eligible = False
     if census_tract.lower() not in census_data.lower():
@@ -137,7 +137,7 @@ def check_application(township, census_tract, parcel_number, tenant_name, applic
         eligible = False
     
     if eligible:
-        st.write("✅ APPLICATION IS ELIGIBLE")
+        st.success("✅ **Application is Eligible**")
 
         table_compare = {
             "Application": [
@@ -154,17 +154,27 @@ def check_application(township, census_tract, parcel_number, tenant_name, applic
             ]
         }
         st.table(table_compare)
-        st.write("Total Units:".ljust(30) + str(unit_count).ljust(30) + "| Eligible Units: " + str(eligible_units))
-        st.write("Unit Ratio:".ljust(30) + f"{(int(eligible_units)/int(unit_count))*100:.2f}%")
+        st.markdown(f"""
+        **Total Units:** {str(unit_count)}  
+        **Eligible Units:** {str(eligible_units)}  
+        **Unit Ratio:** {(int(eligible_units)/int(unit_count))*100:.2f}%  
+        """)
+        st.divider()
         
-        st.write("✅ OTHER CHECKS".center(90))
-        
-        st.write(census_tract_check(census_tract))
-        st.write(township_check(township))
-        st.write(parcel_check(parcel_number))
-        st.write(street_check(street_name, parcel_number, parcel_address))
+        st.markdown("""
+        ### 🔍 **Other Eligibility Checks**
 
-        st.write("UNIT & ADDRESS DETAILS".center(90))
+        """)
+
+        st.markdown(f"""
+        **Census Tract:** {census_tract_check(census_tract)}  
+        **Township:** {township_check(township)}  
+        **Parcel Number:** {parcel_check(parcel_number)}  
+        **Street Address Match:** {street_check(street_name, parcel_number, parcel_address)}
+        """)
+        st.divider()
+
+        st.success("UNIT & ADDRESS DETAILS".center(90))
         df = pd.DataFrame({
             "PIN": [parcel_number],
             "Unit Count": [unit_count],
@@ -179,7 +189,7 @@ def check_application(township, census_tract, parcel_number, tenant_name, applic
         st.table(df)
         return
     else:
-        st.write("❌ APPLICATION NOT ELIGIBLE".center(90))
+        st.error("❌ APPLICATION NOT ELIGIBLE".center(90))
 
         table_compare = {
             "Application": [
@@ -196,15 +206,25 @@ def check_application(township, census_tract, parcel_number, tenant_name, applic
             ]
         }
         st.table(table_compare)
-        st.write("Total Units:".ljust(30) + str(unit_count).ljust(30) + "| Eligible Units: " + str(eligible_units))
-        st.write("Unit Ratio:".ljust(30) + f"{(int(eligible_units)/int(unit_count))*100:.2f}%")
+        st.markdown(f"""
+        **Total Units:** {str(unit_count)}  
+        **Eligible Units:** {str(eligible_units)}  
+        **Unit Ratio:** {(int(eligible_units)/int(unit_count))*100:.2f}%  
+        """)
+        st.divider()
         
-        st.write("✅ OTHER CHECKS".center(90))
-        
-        st.write(census_tract_check(census_tract))
-        st.write(township_check(township))
-        st.write(parcel_check(parcel_number))
-        st.write(street_check(street_name, parcel_number))
+        st.markdown("""
+        ### 🔍 **Other Eligibility Checks**
+
+        """)
+
+        st.markdown(f"""
+        **Census Tract:** {census_tract_check(census_tract)}  
+        **Township:** {township_check(township)}  
+        **Parcel Number:** {parcel_check(parcel_number)}  
+        **Street Address Match:** {street_check(street_name, parcel_number, parcel_address)}
+        """)
+        st.divider()
 
 dha_non_eligible_township = {
     "Wayne": False, 
