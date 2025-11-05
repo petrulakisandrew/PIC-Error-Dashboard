@@ -121,6 +121,12 @@ def check_application(township, census_tract, parcel_number, tenant_name, applic
     
     eligible = True
     
+    if not isinstance(unit_count, int) and not isinstance(eligible_units, int) :
+        print(type(unit_count))
+        st.warning("Please Enter Numeric Values for Unit Count and Eligible Units")
+        return
+        
+    
     if township in dha_non_eligible_township:
         eligible = False
     if census_tract in dha_non_eligible_census:
@@ -135,6 +141,12 @@ def check_application(township, census_tract, parcel_number, tenant_name, applic
         eligible = False
     if int(unit_count) > 2 and (int(eligible_units)/int(unit_count) > 0.2):
         eligible = False
+    
+    if not isinstance(unit_count, int) and not isinstance(eligible_units, int) :
+        print(type(unit_count))
+        st.warning("Please Enter Numeric Values for Unit Count and Eligible Units")
+        return
+        
     
     if eligible:
         st.success("✅ **Application is Eligible**")
@@ -481,8 +493,8 @@ with col1:
     city_name = st.text_input("City Name", width = 400)
     state_name = st.text_input("State Name", "IL", width = 400, disabled = True)
     zip_code = st.text_input("Zip Code", width = 400)
-    unit_count = st.text_input("Unit Count", width = 400)
-    eligible_units = st.text_input("Eligible Units", width = 400)
+    unit_count = st.number_input("Unit Count", min_value = 0, value = 0, width = 400)
+    eligible_units = st.number_input("Eligible Units", min_value = 0, value = 0, width = 400)
     submit = st.button("Run Application Check")
 
 #Applicant Full Address
