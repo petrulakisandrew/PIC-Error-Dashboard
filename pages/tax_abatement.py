@@ -459,16 +459,18 @@ with col1:
     applicant = st.text_input("Applicant Name", width = 400)
     street_name = st.text_input("Street Name", width = 400)
     city_name = st.text_input("City Name", width = 400)
-    state_name = st.text_input("State Name", width = 400)
+    state_name = st.text_input("State Name", "IL", width = 400, disabled = True)
     zip_code = st.text_input("Zip Code", width = 400)
     unit_count = st.text_input("Unit Count", width = 400)
     eligible_units = st.text_input("Eligible Units", width = 400)
+    submit = st.button("Run Application Check")
 
 #Applicant Full Address
 address = f'{street_name} {city_name} {state_name} {zip_code}'
 
 with col2:
-    st.button(label = "Run Application Check", on_click = check_application, args = (township, census_tract, parcel_number, tenant_name, applicant))
+    if submit:
+        check_application(township, census_tract, parcel_number, tenant_name, applicant)
 
 
 
